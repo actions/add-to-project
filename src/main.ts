@@ -8,31 +8,14 @@ import * as github from '@actions/github'
 const urlParse =
   /^(?:https:\/\/)?github\.com\/(?<ownerType>orgs|users)\/(?<ownerName>[^/]+)\/projects\/(?<projectNumber>\d+)/
 
-const projectQuery = (ownerType?: string): string => {
-  const ownerTypeQuery =
-    ownerType === 'orgs'
-      ? 'organization'
-      : ownerType === 'users'
-      ? 'user'
-      : null
-
-  if (!ownerTypeQuery) {
-    throw new Error(
-      `Unsupported ownerType: ${ownerType}. Must be one of 'orgs' or 'users'`
-    )
+interface ProjectNodeIDResponse {
+  organization?: {
+    projectNext: {
+      id: string
+    }
   }
 
-  return `query getProject($ownerName: String!, $projectNumber: Int!) { 
-      ${ownerTypeQuery}(login: $ownerName) {
-        projectNext(number: $projectNumber) {
-          id
-        }
-      }
-    }`
-}
-
-interface ProjectNodeIDResponse {
-  organization: {
+  user?: {
     projectNext: {
       id: string
     }
@@ -64,6 +47,7 @@ async function run(): Promise<void> {
   const ownerName = urlMatch.groups?.ownerName
   const projectNumber = parseInt(urlMatch.groups?.projectNumber ?? '', 10)
   const ownerType = urlMatch.groups?.ownerType
+  const ownerTypeQuery = mustGetOwnerTypeQuery(ownerType)
 
   core.debug(`Org name: ${ownerName}`)
   core.debug(`Project number: ${projectNumber}`)
@@ -71,14 +55,20 @@ async function run(): Promise<void> {
 
   // First, use the GraphQL API to request the project's node ID.
   const idResp = await octokit.graphql<ProjectNodeIDResponse>(
-    projectQuery(ownerType),
+    `query getProject($ownerName: String!, $projectNumber: Int!) { 
+      ${ownerTypeQuery}(login: $ownerName) {
+        projectNext(number: $projectNumber) {
+          id
+        }
+      }
+    }`,
     {
       ownerName,
       projectNumber
     }
   )
 
-  const projectId = idResp.organization.projectNext.id
+  const projectId = idResp[ownerTypeQuery]?.projectNext.id
   const contentId =
     github.context.payload.issue?.node_id ??
     github.context.payload.pull_request?.node_id
@@ -114,3 +104,20 @@ run()
   .then(() => {
     process.exit(0)
   })
+
+function mustGetOwnerTypeQuery(ownerType?: string): 'organization' | 'user' {
+  const ownerTypeQuery =
+    ownerType === 'orgs'
+      ? 'organization'
+      : ownerType === 'users'
+      ? 'user'
+      : null
+
+  if (!ownerTypeQuery) {
+    throw new Error(
+      `Unsupported ownerType: ${ownerType}. Must be one of 'orgs' or 'users'`
+    )
+  }
+
+  return ownerTypeQuery
+}
