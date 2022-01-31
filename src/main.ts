@@ -33,8 +33,29 @@ interface ProjectAddItemResponse {
 async function run(): Promise<void> {
   const projectUrl = core.getInput('project-url', {required: true})
   const ghToken = core.getInput('github-token', {required: true})
+  const labeled = core.getInput('labeled')?.split(',') ?? []
   const octokit = github.getOctokit(ghToken)
   const urlMatch = projectUrl.match(urlParse)
+  const issue =
+    github.context.payload.issue ?? github.context.payload.pull_request
+  const issueLabels: string[] = (issue?.labels ?? []).map(
+    (l: {name: string}) => l.name
+  )
+
+  // Ensure the issue matches our `labeled` filter, if provided.
+  if (labeled.length > 0) {
+    const hasLabel = issueLabels.some(l => labeled.includes(l))
+
+    if (!hasLabel) {
+      core.info(
+        `Skipping issue ${
+          issue?.number
+        } because it does not have one of the labels: ${labeled.join(', ')}`
+      )
+
+      return
+    }
+  }
 
   core.debug(`Project URL: ${projectUrl}`)
 
@@ -69,9 +90,7 @@ async function run(): Promise<void> {
   )
 
   const projectId = idResp[ownerTypeQuery]?.projectNext.id
-  const contentId =
-    github.context.payload.issue?.node_id ??
-    github.context.payload.pull_request?.node_id
+  const contentId = issue?.node_id
 
   core.debug(`Project node ID: ${projectId}`)
   core.debug(`Content ID: ${contentId}`)
