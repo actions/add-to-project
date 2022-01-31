@@ -40,7 +40,7 @@ const core = __importStar(__nccwpck_require__(2186));
 const github = __importStar(__nccwpck_require__(5438));
 // TODO: Ensure this (and the Octokit client) works for non-github.com URLs, as well.
 // https://github.com/orgs/<orgName>/projects/<projectNumber>
-const urlParse = /^(?:https:\/\/)?github\.com\/orgs\/(?<orgName>[^/]+)\/projects\/(?<projectNumber>\d+)/;
+const urlParse = /^(?:https:\/\/)?github\.com\/orgs|users\/(?<orgName>[^/]+)\/projects\/(?<projectNumber>\d+)/;
 function run() {
     var _a, _b, _c, _d, _e, _f;
     return __awaiter(this, void 0, void 0, function* () {

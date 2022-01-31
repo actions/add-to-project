@@ -6,7 +6,7 @@ import * as github from '@actions/github'
 // TODO: Ensure this (and the Octokit client) works for non-github.com URLs, as well.
 // https://github.com/orgs/<orgName>/projects/<projectNumber>
 const urlParse =
-  /^(?:https:\/\/)?github\.com\/orgs\/(?<orgName>[^/]+)\/projects\/(?<projectNumber>\d+)/
+  /^(?:https:\/\/)?github\.com\/orgs|users\/(?<orgName>[^/]+)\/projects\/(?<projectNumber>\d+)/
 
 interface ProjectNodeIDResponse {
   organization: {
