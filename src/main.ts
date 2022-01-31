@@ -1,7 +1,5 @@
-/* eslint-disable github/no-then */
-
-import * as core from '@actions/core'
-import * as github from '@actions/github'
+import core from '@actions/core'
+import github from '@actions/github'
 
 // TODO: Ensure this (and the Octokit client) works for non-github.com URLs, as well.
 // https://github.com/orgs|users/<ownerName>/projects/<projectNumber>
@@ -36,22 +34,15 @@ async function run(): Promise<void> {
   const labeled = core.getInput('labeled')?.split(',') ?? []
   const octokit = github.getOctokit(ghToken)
   const urlMatch = projectUrl.match(urlParse)
-  const issue =
-    github.context.payload.issue ?? github.context.payload.pull_request
-  const issueLabels: string[] = (issue?.labels ?? []).map(
-    (l: {name: string}) => l.name
-  )
+  const issue = github.context.payload.issue ?? github.context.payload.pull_request
+  const issueLabels: string[] = (issue?.labels ?? []).map((l: {name: string}) => l.name)
 
   // Ensure the issue matches our `labeled` filter, if provided.
   if (labeled.length > 0) {
     const hasLabel = issueLabels.some(l => labeled.includes(l))
 
     if (!hasLabel) {
-      core.info(
-        `Skipping issue ${
-          issue?.number
-        } because it does not have one of the labels: ${labeled.join(', ')}`
-      )
+      core.info(`Skipping issue ${issue?.number} because it does not have one of the labels: ${labeled.join(', ')}`)
 
       return
     }
@@ -125,17 +116,10 @@ run()
   })
 
 function mustGetOwnerTypeQuery(ownerType?: string): 'organization' | 'user' {
-  const ownerTypeQuery =
-    ownerType === 'orgs'
-      ? 'organization'
-      : ownerType === 'users'
-      ? 'user'
-      : null
+  const ownerTypeQuery = ownerType === 'orgs' ? 'organization' : ownerType === 'users' ? 'user' : null
 
   if (!ownerTypeQuery) {
-    throw new Error(
-      `Unsupported ownerType: ${ownerType}. Must be one of 'orgs' or 'users'`
-    )
+    throw new Error(`Unsupported ownerType: ${ownerType}. Must be one of 'orgs' or 'users'`)
   }
 
   return ownerTypeQuery
