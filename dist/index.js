@@ -39,10 +39,27 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __importStar(__nccwpck_require__(2186));
 const github = __importStar(__nccwpck_require__(5438));
 // TODO: Ensure this (and the Octokit client) works for non-github.com URLs, as well.
-// https://github.com/orgs/<orgName>/projects/<projectNumber>
-const urlParse = /^(?:https:\/\/)?github\.com\/orgs|users\/(?<orgName>[^/]+)\/projects\/(?<projectNumber>\d+)/;
+// https://github.com/orgs|users/<ownerName>/projects/<projectNumber>
+const urlParse = /^(?:https:\/\/)?github\.com\/(?<ownerType>orgs|users)\/(?<ownerName>[^/]+)\/projects\/(?<projectNumber>\d+)/;
+const projectQuery = (ownerType) => {
+    const ownerTypeQuery = ownerType === 'orgs'
+        ? 'organization'
+        : ownerType === 'users'
+            ? 'user'
+            : null;
+    if (!ownerTypeQuery) {
+        throw new Error(`Unsupported ownerType: ${ownerType}. Must be one of 'orgs' or 'users'`);
+    }
+    return `query getProject($ownerName: String!, $projectNumber: Int!) { 
+      ${ownerTypeQuery}(login: $ownerName) {
+        projectNext(number: $projectNumber) {
+          id
+        }
+      }
+    }`;
+};
 function run() {
-    var _a, _b, _c, _d, _e, _f;
+    var _a, _b, _c, _d, _e, _f, _g;
     return __awaiter(this, void 0, void 0, function* () {
         const projectUrl = core.getInput('project-url', { required: true });
         const ghToken = core.getInput('github-token', { required: true });
@@ -50,25 +67,21 @@ function run() {
         const urlMatch = projectUrl.match(urlParse);
         core.debug(`Project URL: ${projectUrl}`);
         if (!urlMatch) {
-            throw new Error(`Invalid project URL: ${projectUrl}. Project URL should match the format https://github.com/orgs/<orgName>/projects/<projectNumber>`);
+            throw new Error(`Invalid project URL: ${projectUrl}. Project URL should match the format https://github.com/<orgs-or-users>/<ownerName>/projects/<projectNumber>`);
         }
-        const orgName = (_a = urlMatch.groups) === null || _a === void 0 ? void 0 : _a.orgName;
+        const ownerName = (_a = urlMatch.groups) === null || _a === void 0 ? void 0 : _a.ownerName;
         const projectNumber = parseInt((_c = (_b = urlMatch.groups) === null || _b === void 0 ? void 0 : _b.projectNumber) !== null && _c !== void 0 ? _c : '', 10);
-        core.debug(`Org name: ${orgName}`);
+        const ownerType = (_d = urlMatch.groups) === null || _d === void 0 ? void 0 : _d.ownerType;
+        core.debug(`Org name: ${ownerName}`);
         core.debug(`Project number: ${projectNumber}`);
+        core.debug(`Owner type: ${ownerType}`);
         // First, use the GraphQL API to request the project's node ID.
-        const idResp = yield octokit.graphql(`query getProject($orgName: String!, $projectNumber: Int!) { 
-      organization(login: $orgName) {
-        projectNext(number: $projectNumber) {
-          id
-        }
-      }
-    }`, {
-            orgName,
+        const idResp = yield octokit.graphql(projectQuery(ownerType), {
+            ownerName,
             projectNumber
         });
         const projectId = idResp.organization.projectNext.id;
-        const contentId = (_e = (_d = github.context.payload.issue) === null || _d === void 0 ? void 0 : _d.node_id) !== null && _e !== void 0 ? _e : (_f = github.context.payload.pull_request) === null || _f === void 0 ? void 0 : _f.node_id;
+        const contentId = (_f = (_e = github.context.payload.issue) === null || _e === void 0 ? void 0 : _e.node_id) !== null && _f !== void 0 ? _f : (_g = github.context.payload.pull_request) === null || _g === void 0 ? void 0 : _g.node_id;
         core.debug(`Project node ID: ${projectId}`);
         core.debug(`Content ID: ${contentId}`);
         // Next, use the GraphQL API to add the issue to the project.
