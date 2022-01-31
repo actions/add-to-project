@@ -1,0 +1,13 @@
+name: Add to Project 
+description: Automatically add issues and PRs to GitHub projects
+author: GitHub
+inputs:
+  project-url:
+    required: true
+    description: URL of the project to add issues to
+  github-token:
+    required: true
+    description: A GitHub personal access token with write access to the project
+runs:
+  using: 'node12'
+  main: 'dist/index.js'
