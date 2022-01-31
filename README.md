@@ -19,11 +19,16 @@ jobs:
         with:
           project-url: https://github.com/orgs/<orgName>/projects/<projectNumber>
           github-token: ${{ secrets.ADD_TO_PROJECT_PAT }}
+          labeled: bug
 ```
 
 Note that the `github-token` input must be a personal access token with
 `read:org`, `write:org` (to get and update projects) and `repo` scope (for
 adding repo issues to the project).
+
+The `labeled` key is optional, and if specified, the action will only add issues
+that have at least one of the specified labels. This should be a comma-delimited
+string of label names.
 
 ## Code in Main
 
