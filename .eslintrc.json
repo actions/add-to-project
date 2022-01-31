@@ -20,6 +20,7 @@
   "rules": {
     "filenames/match-regex": "off",
     "github/no-then": "off",
-    "i18n-text/no-en": "off"
+    "i18n-text/no-en": "off",
+    "import/no-namespace": "off"
   }
 }

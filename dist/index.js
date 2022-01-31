@@ -6,6 +6,25 @@ require('./sourcemap-register.js');/******/ (() => { // webpackBootstrap
 
 "use strict";
 
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -15,34 +34,31 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const core_1 = __importDefault(__nccwpck_require__(2186));
-const github_1 = __importDefault(__nccwpck_require__(5438));
+const core = __importStar(__nccwpck_require__(2186));
+const github = __importStar(__nccwpck_require__(5438));
 // TODO: Ensure this (and the Octokit client) works for non-github.com URLs, as well.
 // https://github.com/orgs|users/<ownerName>/projects/<projectNumber>
 const urlParse = /^(?:https:\/\/)?github\.com\/(?<ownerType>orgs|users)\/(?<ownerName>[^/]+)\/projects\/(?<projectNumber>\d+)/;
 function run() {
     var _a, _b, _c, _d, _e, _f, _g, _h, _j;
     return __awaiter(this, void 0, void 0, function* () {
-        const projectUrl = core_1.default.getInput('project-url', { required: true });
-        const ghToken = core_1.default.getInput('github-token', { required: true });
-        const labeled = (_b = (_a = core_1.default.getInput('labeled')) === null || _a === void 0 ? void 0 : _a.split(',')) !== null && _b !== void 0 ? _b : [];
-        const octokit = github_1.default.getOctokit(ghToken);
+        const projectUrl = core.getInput('project-url', { required: true });
+        const ghToken = core.getInput('github-token', { required: true });
+        const labeled = (_b = (_a = core.getInput('labeled')) === null || _a === void 0 ? void 0 : _a.split(',')) !== null && _b !== void 0 ? _b : [];
+        const octokit = github.getOctokit(ghToken);
         const urlMatch = projectUrl.match(urlParse);
-        const issue = (_c = github_1.default.context.payload.issue) !== null && _c !== void 0 ? _c : github_1.default.context.payload.pull_request;
+        const issue = (_c = github.context.payload.issue) !== null && _c !== void 0 ? _c : github.context.payload.pull_request;
         const issueLabels = ((_d = issue === null || issue === void 0 ? void 0 : issue.labels) !== null && _d !== void 0 ? _d : []).map((l) => l.name);
         // Ensure the issue matches our `labeled` filter, if provided.
         if (labeled.length > 0) {
             const hasLabel = issueLabels.some(l => labeled.includes(l));
             if (!hasLabel) {
-                core_1.default.info(`Skipping issue ${issue === null || issue === void 0 ? void 0 : issue.number} because it does not have one of the labels: ${labeled.join(', ')}`);
+                core.info(`Skipping issue ${issue === null || issue === void 0 ? void 0 : issue.number} because it does not have one of the labels: ${labeled.join(', ')}`);
                 return;
             }
         }
-        core_1.default.debug(`Project URL: ${projectUrl}`);
+        core.debug(`Project URL: ${projectUrl}`);
         if (!urlMatch) {
             throw new Error(`Invalid project URL: ${projectUrl}. Project URL should match the format https://github.com/<orgs-or-users>/<ownerName>/projects/<projectNumber>`);
         }
@@ -50,9 +66,9 @@ function run() {
         const projectNumber = parseInt((_g = (_f = urlMatch.groups) === null || _f === void 0 ? void 0 : _f.projectNumber) !== null && _g !== void 0 ? _g : '', 10);
         const ownerType = (_h = urlMatch.groups) === null || _h === void 0 ? void 0 : _h.ownerType;
         const ownerTypeQuery = mustGetOwnerTypeQuery(ownerType);
-        core_1.default.debug(`Org name: ${ownerName}`);
-        core_1.default.debug(`Project number: ${projectNumber}`);
-        core_1.default.debug(`Owner type: ${ownerType}`);
+        core.debug(`Org name: ${ownerName}`);
+        core.debug(`Project number: ${projectNumber}`);
+        core.debug(`Owner type: ${ownerType}`);
         // First, use the GraphQL API to request the project's node ID.
         const idResp = yield octokit.graphql(`query getProject($ownerName: String!, $projectNumber: Int!) { 
       ${ownerTypeQuery}(login: $ownerName) {
@@ -66,8 +82,8 @@ function run() {
         });
         const projectId = (_j = idResp[ownerTypeQuery]) === null || _j === void 0 ? void 0 : _j.projectNext.id;
         const contentId = issue === null || issue === void 0 ? void 0 : issue.node_id;
-        core_1.default.debug(`Project node ID: ${projectId}`);
-        core_1.default.debug(`Content ID: ${contentId}`);
+        core.debug(`Project node ID: ${projectId}`);
+        core.debug(`Content ID: ${contentId}`);
         // Next, use the GraphQL API to add the issue to the project.
         const addResp = yield octokit.graphql(`mutation addIssueToProject($input: AddProjectNextItemInput!) {
       addProjectNextItem(input: $input) {
@@ -81,12 +97,12 @@ function run() {
                 projectId
             }
         });
-        core_1.default.setOutput('itemId', addResp.addProjectNextItem.projectNextItem.id);
+        core.setOutput('itemId', addResp.addProjectNextItem.projectNextItem.id);
     });
 }
 run()
     .catch(err => {
-    core_1.default.setFailed(err.message);
+    core.setFailed(err.message);
     process.exit(1);
 })
     .then(() => {
