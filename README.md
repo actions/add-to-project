@@ -43,7 +43,7 @@ $ npm install
 Build the typescript and package it for distribution
 
 ```bash
-$ npm run build && npm run package
+$ npm run build
 ```
 
 Run the tests :heavy_check_mark:

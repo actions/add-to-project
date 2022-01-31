@@ -48,8 +48,6 @@
     "check:format": "prettier --check .",
     "check:lint": "eslint .",
     "fix:format": "prettier --write .",
-    "lint": "eslint src/**/*.ts",
-    "package": "ncc build --source-map --license licenses.txt",
     "test": "jest"
   }
 }
