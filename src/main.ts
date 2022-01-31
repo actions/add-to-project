@@ -31,7 +31,12 @@ interface ProjectAddItemResponse {
 async function run(): Promise<void> {
   const projectUrl = core.getInput('project-url', {required: true})
   const ghToken = core.getInput('github-token', {required: true})
-  const labeled = core.getInput('labeled')?.split(',') ?? []
+  const labeled =
+    core
+      .getInput('labeled')
+      .split(',')
+      .map(l => l.trim())
+      .filter(l => l.length > 0) ?? []
   const octokit = github.getOctokit(ghToken)
   const urlMatch = projectUrl.match(urlParse)
   const issue = github.context.payload.issue ?? github.context.payload.pull_request

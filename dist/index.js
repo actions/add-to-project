@@ -41,15 +41,19 @@ const github = __importStar(__nccwpck_require__(5438));
 // https://github.com/orgs|users/<ownerName>/projects/<projectNumber>
 const urlParse = /^(?:https:\/\/)?github\.com\/(?<ownerType>orgs|users)\/(?<ownerName>[^/]+)\/projects\/(?<projectNumber>\d+)/;
 function run() {
-    var _a, _b, _c, _d, _e, _f, _g, _h, _j;
+    var _a, _b, _c, _d, _e, _f, _g, _h;
     return __awaiter(this, void 0, void 0, function* () {
         const projectUrl = core.getInput('project-url', { required: true });
         const ghToken = core.getInput('github-token', { required: true });
-        const labeled = (_b = (_a = core.getInput('labeled')) === null || _a === void 0 ? void 0 : _a.split(',')) !== null && _b !== void 0 ? _b : [];
+        const labeled = (_a = core
+            .getInput('labeled')
+            .split(',')
+            .map(l => l.trim())
+            .filter(l => l.length > 0)) !== null && _a !== void 0 ? _a : [];
         const octokit = github.getOctokit(ghToken);
         const urlMatch = projectUrl.match(urlParse);
-        const issue = (_c = github.context.payload.issue) !== null && _c !== void 0 ? _c : github.context.payload.pull_request;
-        const issueLabels = ((_d = issue === null || issue === void 0 ? void 0 : issue.labels) !== null && _d !== void 0 ? _d : []).map((l) => l.name);
+        const issue = (_b = github.context.payload.issue) !== null && _b !== void 0 ? _b : github.context.payload.pull_request;
+        const issueLabels = ((_c = issue === null || issue === void 0 ? void 0 : issue.labels) !== null && _c !== void 0 ? _c : []).map((l) => l.name);
         // Ensure the issue matches our `labeled` filter, if provided.
         if (labeled.length > 0) {
             const hasLabel = issueLabels.some(l => labeled.includes(l));
@@ -62,9 +66,9 @@ function run() {
         if (!urlMatch) {
             throw new Error(`Invalid project URL: ${projectUrl}. Project URL should match the format https://github.com/<orgs-or-users>/<ownerName>/projects/<projectNumber>`);
         }
-        const ownerName = (_e = urlMatch.groups) === null || _e === void 0 ? void 0 : _e.ownerName;
-        const projectNumber = parseInt((_g = (_f = urlMatch.groups) === null || _f === void 0 ? void 0 : _f.projectNumber) !== null && _g !== void 0 ? _g : '', 10);
-        const ownerType = (_h = urlMatch.groups) === null || _h === void 0 ? void 0 : _h.ownerType;
+        const ownerName = (_d = urlMatch.groups) === null || _d === void 0 ? void 0 : _d.ownerName;
+        const projectNumber = parseInt((_f = (_e = urlMatch.groups) === null || _e === void 0 ? void 0 : _e.projectNumber) !== null && _f !== void 0 ? _f : '', 10);
+        const ownerType = (_g = urlMatch.groups) === null || _g === void 0 ? void 0 : _g.ownerType;
         const ownerTypeQuery = mustGetOwnerTypeQuery(ownerType);
         core.debug(`Org name: ${ownerName}`);
         core.debug(`Project number: ${projectNumber}`);
@@ -80,7 +84,7 @@ function run() {
             ownerName,
             projectNumber
         });
-        const projectId = (_j = idResp[ownerTypeQuery]) === null || _j === void 0 ? void 0 : _j.projectNext.id;
+        const projectId = (_h = idResp[ownerTypeQuery]) === null || _h === void 0 ? void 0 : _h.projectNext.id;
         const contentId = issue === null || issue === void 0 ? void 0 : issue.node_id;
         core.debug(`Project node ID: ${projectId}`);
         core.debug(`Content ID: ${contentId}`);
