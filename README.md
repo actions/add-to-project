@@ -1,14 +1,24 @@
 # @actions/add-to-project
 
-**🚨 This action is a work in progress. Please do not use it except for experimentation until a release has been prepared. Thanks!**
+🚨 This action is a work in progress. Please do not use it except for
+experimentation until a release has been prepared. 🚨
 
-Use this action to automatically add issues to a project when they're opened.
+Use this action to automatically add issues to a GitHub Project. Note that this
+is for [GitHub Projects
+(beta)](https://docs.github.com/en/issues/trying-out-the-new-projects-experience/about-projects),
+not the original GitHub Projects.
+
+To use the action, create a workflow that runs when issues are opened in your
+repository. Run this action in a step, optionally configuring any filters you
+may want to add, such as only adding issues with certain labels.
 
 ```yaml
-name: Add to project
+name: Add bugs to bugs project
 
 on:
-  issues: {types: [opened]}
+  issues:
+    types:
+      - opened
 
 jobs:
   add-to-project:
@@ -22,100 +32,44 @@ jobs:
           labeled: bug
 ```
 
-Note that the `github-token` input must be a personal access token with
-`read:org`, `write:org` (to get and update projects) and `repo` scope (for
-adding repo issues to the project).
+## Inputs
 
-The `labeled` key is optional, and if specified, the action will only add issues
-that have at least one of the specified labels. This should be a comma-delimited
-string of label names.
+- `project-url` is the URL of the GitHub Project to add issues to.
+- `github-token` is a [personal access
+  token](https://github.com/settings/tokens/new) with the `repo`, `write:org` and
+  `read:org` scopes.
+- `labeled` is a comma-separated list of labels. For an issue to be added to the
+  project, it must have _one_ of the labels in the list. Omitting this key means
+  that all issues will be added.
 
-## Code in Main
+## Development
 
-> First, you'll need to have a reasonably modern version of `node` handy. This won't work with versions older than 9, for instance.
+To get started contributing to this project, clone it and install dependencies.
+Note that this action runs in Node.js 12.x, so we recommend using that version
+of Node (see "engines" in this action's package.json for details).
 
-Install the dependencies
-
-```bash
-$ npm install
+```shell
+> git clone https://github.com/actions/add-to-project
+> cd add-to-project
+> npm install
 ```
 
-Build the typescript and package it for distribution
+Or, use [GitHub Codespaces](https://github.com/features/codespaces).
 
-```bash
-$ npm run build
-```
-
-Run the tests :heavy_check_mark:
-
-```bash
-$ npm test
-
- PASS  ./index.test.js
-...
-```
-
-## Change action.yml
-
-The action.yml defines the inputs and output for your action.
-
-Update the action.yml with your name, description, inputs and outputs for your action.
-
-See the [documentation](https://help.github.com/en/articles/metadata-syntax-for-github-actions)
-
-## Change the Code
-
-Most toolkit and CI/CD operations involve async operations so the action is run in an async function.
-
-```javascript
-import * as core from '@actions/core';
-...
-
-async function run() {
-  try {
-      ...
-  }
-  catch (error) {
-    core.setFailed(error.message);
-  }
-}
-
-run()
-```
-
-See the [toolkit documentation](https://github.com/actions/toolkit/blob/master/README.md#packages) for the various packages.
+See the [toolkit
+documentation](https://github.com/actions/toolkit/blob/master/README.md#packages)
+for the various packages used in building this action.
 
 ## Publish to a distribution branch
 
-Actions are run from GitHub repos so we will checkin the packed dist folder.
+Actions are run from GitHub repositories, so we check in the packaged action in
+the "dist/" directory.
 
-Then run [ncc](https://github.com/zeit/ncc) and push the results:
-
-```bash
-$ npm run package
-$ git add dist
-$ git commit -a -m "prod dependencies"
-$ git push origin releases/v1
+```shell
+> npm run build
+> git add lib dist
+> git commit -a -m "Build and package"
+> git push origin releases/v1
 ```
 
-Note: We recommend using the `--license` option for ncc, which will create a license file for all of the production node modules used in your project.
-
-Your action is now published! :rocket:
-
-See the [versioning documentation](https://github.com/actions/toolkit/blob/master/docs/action-versioning.md)
-
-## Validate
-
-You can now validate the action by referencing `./` in a workflow in your repo (see [test.yml](.github/workflows/test.yml))
-
-```yaml
-uses: ./
-with:
-  milliseconds: 1000
-```
-
-See the [actions tab](https://github.com/actions/typescript-action/actions) for runs of this action! :rocket:
-
-## Usage:
-
-After testing you can [create a v1 tag](https://github.com/actions/toolkit/blob/master/docs/action-versioning.md) to reference the stable and latest V1 action
+Now, a release can be created from the branch containing the built action.
