@@ -13,6 +13,7 @@
   },
   "devDependencies": {
     "@github/prettier-config": "^0.0.4",
+    "@types/jest": "^27.4.0",
     "@types/node": "^12.12.6",
     "@typescript-eslint/parser": "^5.10.2",
     "@vercel/ncc": "^0.33.1",
