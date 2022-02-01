@@ -1,7 +1,7 @@
 # @actions/add-to-project
 
-🚨 This action is a work in progress. Please do not use it except for
-experimentation until a release has been prepared. 🚨
+🚨 **This action is a work in progress. Please do not use it except for
+experimentation until a release has been prepared.** 🚨
 
 Use this action to automatically add issues to a GitHub Project. Note that this
 is for [GitHub Projects
