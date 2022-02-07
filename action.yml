@@ -12,5 +12,5 @@ inputs:
     required: false
     description: A comma-separated list of labels to use as a filter for issue to be added
 runs:
-  using: 'node12'
+  using: 'node16'
   main: 'dist/index.js'
