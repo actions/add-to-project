@@ -45,7 +45,7 @@ jobs:
 ## Development
 
 To get started contributing to this project, clone it and install dependencies.
-Note that this action runs in Node.js 12.x, so we recommend using that version
+Note that this action runs in Node.js 16.x, so we recommend using that version
 of Node (see "engines" in this action's package.json for details).
 
 ```shell

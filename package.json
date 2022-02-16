@@ -8,7 +8,7 @@
     "@actions/github": "^5.0.0"
   },
   "engines": {
-    "node": ">=12.0.0 <17.0.0",
+    "node": ">=16.0.0 <17.0.0",
     "npm": ">= 7.0.0"
   },
   "devDependencies": {
