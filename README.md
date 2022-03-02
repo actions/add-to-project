@@ -25,7 +25,9 @@ jobs:
     name: Add issue to project
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/add-to-project@v1
+      # Pointing to a branch name generally isn't the safest way to refer to an action,
+      # but this is how you can use this action now before we've begun creating releases.
+      - uses: actions/add-to-project@main
         with:
           project-url: https://github.com/orgs/<orgName>/projects/<projectNumber>
           github-token: ${{ secrets.ADD_TO_PROJECT_PAT }}
