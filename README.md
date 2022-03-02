@@ -1,4 +1,4 @@
-# @actions/add-to-project
+# actions/add-to-project
 
 🚨 **This action is a work in progress. Please do not use it except for
 experimentation until a release has been prepared.** 🚨
