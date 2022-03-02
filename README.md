@@ -27,6 +27,7 @@ jobs:
     steps:
       # Pointing to a branch name generally isn't the safest way to refer to an action,
       # but this is how you can use this action now before we've begun creating releases.
+      # Another option would be to point to a full commit SHA.
       - uses: actions/add-to-project@main
         with:
           project-url: https://github.com/orgs/<orgName>/projects/<projectNumber>
