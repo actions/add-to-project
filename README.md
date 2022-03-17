@@ -3,7 +3,8 @@
 🚨 **This action is a work in progress. Please do not use it except for
 experimentation until a release has been prepared.** 🚨
 
-Use this action to automatically add issues to a GitHub Project. Note that this
+Use this action to automatically add the current issue or pull request to a GitHub Project.
+Note that this
 is for [GitHub Projects
 (beta)](https://docs.github.com/en/issues/trying-out-the-new-projects-experience/about-projects),
 not the original GitHub Projects.
