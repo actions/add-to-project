@@ -41,9 +41,9 @@ jobs:
 - `github-token` is a [personal access
   token](https://github.com/settings/tokens/new) with the `repo`, `write:org` and
   `read:org` scopes.
-- `labeled` is a comma-separated list of labels. For an issue to be added to the
-  project, it must have _one_ of the labels in the list. Omitting this key means
-  that all issues will be added.
+- `labeled` is an optional comma-separated list of labels used to filter applicable issues.
+  When this key is provided, an issue must have _one_ of the labels in the list to be added
+  to the project. Omitting this key means that any issue will be added.
 
 ## Development
 
