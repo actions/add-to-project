@@ -1,12 +1,18 @@
 # actions/add-to-project
 
-🚨 **This action is a work in progress. Please do not use it except for
-experimentation until a release has been prepared.** 🚨
-
 Use this action to automatically add issues to a GitHub Project. Note that this
 is for [GitHub Projects
 (beta)](https://docs.github.com/en/issues/trying-out-the-new-projects-experience/about-projects),
 not the original GitHub Projects.
+
+## Current Status
+
+![Build status](https://github.com/github/add-to-project/workflows/test/badge.svg)
+
+🚨 **This action is a work-in-progress. Please do not use it except for
+experimentation until a release has been prepared.** 🚨
+
+## Usage
 
 To use the action, create a workflow that runs when issues are opened in your
 repository. Run this action in a step, optionally configuring any filters you
@@ -76,3 +82,7 @@ the "dist/" directory.
 ```
 
 Now, a release can be created from the branch containing the built action.
+
+# License
+
+The scripts and documentation in this project are released under the [MIT License](LICENSE)
