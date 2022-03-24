@@ -42,14 +42,23 @@ jobs:
           labeled: bug
 ```
 
+#### Further reading and additional resources
+
+- [Inputs](#inputs)
+- [Supported Events](#supported-events)
+- [How to point the action to a specific branch or commit sha](#how-to-point-the-action-to-a-specific-branch-or-commit-sha)
+- [Creating a PAT and adding it to your repository](creating-a-pat-and-adding-it-to-your-repository)
+- [Development](#development)
+- [Publish to a distribution branch](#publish-to-a-distribution-branch)
+
 ## Inputs
 
-- <a name="project-url">`project-url`</a> _(required)_ is the URL of the GitHub Project to add issues to.
-- <a name="github-token">`github-token`</a> _(required)_ is a [personal access
+- <a name="project-url">`project-url`</a> **(required)** is the URL of the GitHub Project to add issues to.
+- <a name="github-token">`github-token`</a> **(required)** is a [personal access
   token](https://github.com/settings/tokens/new) with the `repo`, `write:org` and
-  `read:org` scopes.
+  `read:org` scopes.  
   _See [Creating a PAT and adding it to your repository](creating-a-pat-and-adding-it-to-your-repository) for more details_
-- <a name="labeled">`labeled`</a> _(optional)_ is a comma-separated list of labels used to filter applicable issues. When this key is provided, an issue must have _one_ of the labels in the list to be added to the project. Omitting this key means that any issue will be added.
+- <a name="labeled">`labeled`</a> **(optional)** is a comma-separated list of labels used to filter applicable issues. When this key is provided, an issue must have _one_ of the labels in the list to be added to the project. Omitting this key means that any issue will be added.
 
 ## Supported Events
 
@@ -94,11 +103,11 @@ jobs:
 
 - create a new [personal access
   token](https://github.com/settings/tokens/new) with `repo`, `write:org` and
-  `read:org` scopes
-  _see [Creating a personal access token](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token) for more information_
+  `read:org` scopes  
+  _See [Creating a personal access token](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token) for more information_
 
-- add the newly created PAT as a repository secret, this secret will be referenced by the [github-token input](#github-token)
-  _see [Encrypted secrets](https://docs.github.com/en/actions/security-guides/encrypted-secrets#creating-encrypted-secrets-for-a-repository) for more information_
+- add the newly created PAT as a repository secret, this secret will be referenced by the [github-token input](#github-token)  
+  _See [Encrypted secrets](https://docs.github.com/en/actions/security-guides/encrypted-secrets#creating-encrypted-secrets-for-a-repository) for more information_
 
 ## Development
 
