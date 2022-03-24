@@ -33,7 +33,7 @@ jobs:
           project-url: https://github.com/orgs/<orgName>/projects/<projectNumber>
           github-token: ${{ secrets.ADD_TO_PROJECT_PAT }}
           labeled: bug, new
-          label-operator: AND 
+          label-operator: AND
 ```
 
 ## Inputs
