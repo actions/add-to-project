@@ -7,7 +7,7 @@ not the original GitHub Projects.
 
 ## Current Status
 
-![Build status](https://github.com/github/add-to-project/workflows/test/badge.svg)
+![Build status](https://github.com/actions/add-to-project/workflows/test/badge.svg)
 
 🚨 **This action is a work-in-progress. Please do not use it except for
 experimentation until a release has been prepared.** 🚨
