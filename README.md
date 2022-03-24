@@ -97,10 +97,10 @@ jobs:
 - create a new [personal access
   token](https://github.com/settings/tokens/new) with `repo`, `write:org` and
   `read:org` scopes
-  _see [Creating a personal access token](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token)_
+  _see [Creating a personal access token](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token) for more information_
 
 - add the newly created PAT as a repository secret, this secret will be referenced by the [github-token input](#github-token)
-  _see [Encrypted secrets](https://docs.github.com/en/actions/security-guides/encrypted-secrets#creating-encrypted-secrets-for-a-repository)_
+  _see [Encrypted secrets](https://docs.github.com/en/actions/security-guides/encrypted-secrets#creating-encrypted-secrets-for-a-repository) for more information_
 
 ## Development
 
