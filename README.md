@@ -53,7 +53,8 @@ jobs:
 
 ## Inputs
 
-- <a name="project-url">`project-url`</a> **(required)** is the URL of the GitHub Project to add issues to.
+- <a name="project-url">`project-url`</a> **(required)** is the URL of the GitHub Project to add issues to.  
+  _eg: `https://github.com/orgs|users/<ownerName>/projects/<projectNumber>`_
 - <a name="github-token">`github-token`</a> **(required)** is a [personal access
   token](https://github.com/settings/tokens/new) with the `repo`, `write:org` and
   `read:org` scopes.  
