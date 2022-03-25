@@ -10,7 +10,7 @@ not the original GitHub Projects.
 
 To use the action, create a workflow that runs when issues are opened in your
 repository. Run this action in a step, optionally configuring any filters you
-may want to add, such as only adding issues with certain labels.
+may want to add, such as only adding issues with certain labels. If you want to match all the labels, add `label-operator` input to be `AND`.
 
 ```yaml
 name: Add bugs to bugs project
@@ -32,7 +32,8 @@ jobs:
         with:
           project-url: https://github.com/orgs/<orgName>/projects/<projectNumber>
           github-token: ${{ secrets.ADD_TO_PROJECT_PAT }}
-          labeled: bug
+          labeled: bug, new
+          label-operator: AND
 ```
 
 ## Inputs
@@ -42,8 +43,9 @@ jobs:
   token](https://github.com/settings/tokens/new) with the `repo`, `write:org` and
   `read:org` scopes.
 - `labeled` is a comma-separated list of labels. For an issue to be added to the
-  project, it must have _one_ of the labels in the list. Omitting this key means
+  project, it must have _one_ of the labels in the list if the `label-operator` doesn't exist or not `AND`. Omitting this key means
   that all issues will be added.
+- `label-operator` is the behavior of the labels filter, either `AND` or `OR` that controls if the issue should be matched with `all` `labeled` input or any of them, default is `OR`.
 
 ## Development
 

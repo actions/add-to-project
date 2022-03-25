@@ -37,18 +37,22 @@ export async function addToProject(): Promise<void> {
       .split(',')
       .map(l => l.trim())
       .filter(l => l.length > 0) ?? []
+  const labelOperator = core.getInput('label-operator').trim().toLocaleLowerCase()
+
   const octokit = github.getOctokit(ghToken)
   const urlMatch = projectUrl.match(urlParse)
   const issue = github.context.payload.issue ?? github.context.payload.pull_request
   const issueLabels: string[] = (issue?.labels ?? []).map((l: {name: string}) => l.name)
 
-  // Ensure the issue matches our `labeled` filter, if provided.
-  if (labeled.length > 0) {
-    const hasLabel = issueLabels.some(l => labeled.includes(l))
-
-    if (!hasLabel) {
+  // Ensure the issue matches our `labeled` filter based on the label-operator.
+  if (labelOperator === 'and') {
+    if (!labeled.every(l => issueLabels.includes(l))) {
+      core.info(`Skipping issue ${issue?.number} because it doesn't match all the labels: ${labeled.join(', ')}`)
+      return
+    }
+  } else {
+    if (labeled.length > 0 && !issueLabels.some(l => labeled.includes(l))) {
       core.info(`Skipping issue ${issue?.number} because it does not have one of the labels: ${labeled.join(', ')}`)
-
       return
     }
   }

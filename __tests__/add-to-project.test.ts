@@ -52,11 +52,11 @@ describe('addToProject', () => {
     expect(outputs.itemId).toEqual('project-next-item-id')
   })
 
-  test('adds matching issues with a label filter', async () => {
+  test('adds matching issues with a label filter without label-operator', async () => {
     mockGetInput({
       'project-url': 'https://github.com/orgs/github/projects/1',
       'github-token': 'gh_token',
-      labeled: 'bug'
+      labeled: 'bug, new'
     })
 
     github.context.payload = {
@@ -94,7 +94,7 @@ describe('addToProject', () => {
     expect(outputs.itemId).toEqual('project-next-item-id')
   })
 
-  test('does not add un-matching issues with a label filter', async () => {
+  test('does not add un-matching issues with a label filter without label-operator', async () => {
     mockGetInput({
       'project-url': 'https://github.com/orgs/github/projects/1',
       'github-token': 'gh_token',
@@ -112,6 +112,71 @@ describe('addToProject', () => {
     const gqlMock = mockGraphQL()
     await addToProject()
     expect(infoSpy).toHaveBeenCalledWith(`Skipping issue 1 because it does not have one of the labels: bug`)
+    expect(gqlMock).not.toHaveBeenCalled()
+  })
+
+  test('adds matching issues with labels filter with AND label-operator', async () => {
+    mockGetInput({
+      'project-url': 'https://github.com/orgs/github/projects/1',
+      'github-token': 'gh_token',
+      labeled: 'bug, new',
+      'label-operator': 'AND'
+    })
+
+    github.context.payload = {
+      issue: {
+        number: 1,
+        labels: [{name: 'bug'}, {name: 'new'}]
+      }
+    }
+
+    mockGraphQL(
+      {
+        test: /getProject/,
+        return: {
+          organization: {
+            projectNext: {
+              id: 'project-next-id'
+            }
+          }
+        }
+      },
+      {
+        test: /addProjectNextItem/,
+        return: {
+          addProjectNextItem: {
+            projectNextItem: {
+              id: 'project-next-item-id'
+            }
+          }
+        }
+      }
+    )
+
+    await addToProject()
+
+    expect(outputs.itemId).toEqual('project-next-item-id')
+  })
+
+  test('does not add un-matching issues with labels filter with AND label-operator', async () => {
+    mockGetInput({
+      'project-url': 'https://github.com/orgs/github/projects/1',
+      'github-token': 'gh_token',
+      labeled: 'bug, new',
+      'label-operator': 'AND'
+    })
+
+    github.context.payload = {
+      issue: {
+        number: 1,
+        labels: [{name: 'bug'}, {name: 'other'}]
+      }
+    }
+
+    const infoSpy = jest.spyOn(core, 'info')
+    const gqlMock = mockGraphQL()
+    await addToProject()
+    expect(infoSpy).toHaveBeenCalledWith(`Skipping issue 1 because it doesn't match all the labels: bug, new`)
     expect(gqlMock).not.toHaveBeenCalled()
   })
 })
