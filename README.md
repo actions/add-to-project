@@ -1,7 +1,7 @@
 # actions/add-to-project
 
-Use this action to automatically add issues to a GitHub Project. Note that this
-is for [GitHub Projects
+Use this action to automatically add the current issue to a GitHub Project.
+Note that this is for [GitHub Projects
 (beta)](https://docs.github.com/en/issues/trying-out-the-new-projects-experience/about-projects),
 not the original GitHub Projects.
 
