@@ -51,14 +51,20 @@ function addToProject() {
             .split(',')
             .map(l => l.trim())
             .filter(l => l.length > 0)) !== null && _a !== void 0 ? _a : [];
+        const labelOperator = core.getInput('label-operator').trim().toLocaleLowerCase();
         const octokit = github.getOctokit(ghToken);
         const urlMatch = projectUrl.match(urlParse);
         const issue = (_b = github.context.payload.issue) !== null && _b !== void 0 ? _b : github.context.payload.pull_request;
         const issueLabels = ((_c = issue === null || issue === void 0 ? void 0 : issue.labels) !== null && _c !== void 0 ? _c : []).map((l) => l.name);
-        // Ensure the issue matches our `labeled` filter, if provided.
-        if (labeled.length > 0) {
-            const hasLabel = issueLabels.some(l => labeled.includes(l));
-            if (!hasLabel) {
+        // Ensure the issue matches our `labeled` filter based on the label-operator.
+        if (labelOperator === 'and') {
+            if (!labeled.every(l => issueLabels.includes(l))) {
+                core.info(`Skipping issue ${issue === null || issue === void 0 ? void 0 : issue.number} because it doesn't match all the labels: ${labeled.join(', ')}`);
+                return;
+            }
+        }
+        else {
+            if (labeled.length > 0 && !issueLabels.some(l => labeled.includes(l))) {
                 core.info(`Skipping issue ${issue === null || issue === void 0 ? void 0 : issue.number} because it does not have one of the labels: ${labeled.join(', ')}`);
                 return;
             }

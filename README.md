@@ -20,7 +20,7 @@ _For more information about workflows, see [Using workflows](https://docs.github
 
 To use the action, create a workflow that runs when issues are opened in your
 repository. Run this action in a step, optionally configuring any filters you
-may want to add, such as only adding issues with certain labels.
+may want to add, such as only adding issues with certain labels. If you want to match all the labels, add `label-operator` input to be `AND`.
 
 ```yaml
 name: Add bugs to bugs project
@@ -39,7 +39,8 @@ jobs:
         with:
           project-url: https://github.com/orgs/<orgName>/projects/<projectNumber>
           github-token: ${{ secrets.ADD_TO_PROJECT_PAT }}
-          labeled: bug
+          labeled: bug, new
+          label-operator: AND
 ```
 
 #### Further reading and additional resources
@@ -60,6 +61,7 @@ jobs:
   `read:org` scopes.  
   _See [Creating a PAT and adding it to your repository](creating-a-pat-and-adding-it-to-your-repository) for more details_
 - <a name="labeled">`labeled`</a> **(optional)** is a comma-separated list of labels used to filter applicable issues. When this key is provided, an issue must have _one_ of the labels in the list to be added to the project. Omitting this key means that any issue will be added.
+- <a name="labeled">`label-operator`</a> **(optional)** is the behavior of the labels filter, either `AND` or `OR` that controls if the issue should be matched with `all` `labeled` input or any of them, default is `OR`.
 
 ## Supported Events
 
