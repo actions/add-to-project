@@ -292,6 +292,96 @@ describe('addToProject', () => {
     expect(infoSpy).not.toHaveBeenCalled()
     expect(gqlMock).not.toHaveBeenCalled()
   })
+
+  test('constructs the correct graphQL query given an organization owner', async () => {
+    mockGetInput({
+      'project-url': 'https://github.com/orgs/github/projects/1',
+      'github-token': 'gh_token',
+      labeled: 'bug, new'
+    })
+
+    github.context.payload = {
+      issue: {
+        number: 1,
+        labels: [{name: 'bug'}]
+      }
+    }
+
+    const gqlMock = mockGraphQL(
+      {
+        test: /getProject/,
+        return: {
+          organization: {
+            projectNext: {
+              id: 'project-next-id'
+            }
+          }
+        }
+      },
+      {
+        test: /addProjectNextItem/,
+        return: {
+          addProjectNextItem: {
+            projectNextItem: {
+              id: 'project-next-item-id'
+            }
+          }
+        }
+      }
+    )
+
+    await addToProject()
+
+    expect(gqlMock).toHaveBeenNthCalledWith(1, expect.stringContaining('organization(login: $ownerName)'), {
+      ownerName: 'github',
+      projectNumber: 1
+    })
+  })
+
+  test('constructs the correct graphQL query given a user owner', async () => {
+    mockGetInput({
+      'project-url': 'https://github.com/users/monalisa/projects/1',
+      'github-token': 'gh_token',
+      labeled: 'bug, new'
+    })
+
+    github.context.payload = {
+      issue: {
+        number: 1,
+        labels: [{name: 'bug'}]
+      }
+    }
+
+    const gqlMock = mockGraphQL(
+      {
+        test: /getProject/,
+        return: {
+          organization: {
+            projectNext: {
+              id: 'project-next-id'
+            }
+          }
+        }
+      },
+      {
+        test: /addProjectNextItem/,
+        return: {
+          addProjectNextItem: {
+            projectNextItem: {
+              id: 'project-next-item-id'
+            }
+          }
+        }
+      }
+    )
+
+    await addToProject()
+
+    expect(gqlMock).toHaveBeenNthCalledWith(1, expect.stringContaining('user(login: $ownerName)'), {
+      ownerName: 'monalisa',
+      projectNumber: 1
+    })
+  })
 })
 
 function mockGetInput(mocks: Record<string, string>): jest.SpyInstance {
