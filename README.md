@@ -48,7 +48,7 @@ jobs:
 - [Inputs](#inputs)
 - [Supported Events](#supported-events)
 - [How to point the action to a specific branch or commit sha](#how-to-point-the-action-to-a-specific-branch-or-commit-sha)
-- [Creating a PAT and adding it to your repository](creating-a-pat-and-adding-it-to-your-repository)
+- [Creating a PAT and adding it to your repository](#creating-a-pat-and-adding-it-to-your-repository)
 - [Development](#development)
 - [Publish to a distribution branch](#publish-to-a-distribution-branch)
 
