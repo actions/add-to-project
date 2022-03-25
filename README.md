@@ -67,6 +67,7 @@ Currently this action supports the following [issue events](https://docs.github.
 
 - `opened`
 - `transferred`
+- `labeled`
 
 This ensures that all issues in the workflow's repo are added to the [specified project](#project-url). If [labeled input(s)](#labeled) are defined, then issues will only be added if they contain at least _one_ of the labels in the list.
 
