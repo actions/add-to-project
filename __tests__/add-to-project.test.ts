@@ -94,6 +94,75 @@ describe('addToProject', () => {
     expect(outputs.itemId).toEqual('project-next-item-id')
   })
 
+  test('adds matching issues with multiple label filters', async () => {
+    mockGetInput({
+      'project-url': 'https://github.com/orgs/github/projects/1',
+      'github-token': 'gh_token',
+      labeled: 'accessibility,backend,bug'
+    })
+
+    github.context.payload = {
+      issue: {
+        number: 1,
+        labels: [{name: 'accessibility'}, {name: 'backend'}]
+      }
+    }
+
+    const gqlMock = mockGraphQL(
+      {
+        test: /getProject/,
+        return: {
+          organization: {
+            projectNext: {
+              id: 'project-next-id'
+            }
+          }
+        }
+      },
+      {
+        test: /addProjectNextItem/,
+        return: {
+          addProjectNextItem: {
+            projectNextItem: {
+              id: 'project-next-item-id'
+            }
+          }
+        }
+      }
+    )
+
+    const infoSpy = jest.spyOn(core, 'info')
+
+    await addToProject()
+
+    expect(gqlMock).toHaveBeenCalled()
+    expect(infoSpy).not.toHaveBeenCalled()
+    expect(outputs.itemId).toEqual('project-next-item-id')
+  })
+
+  test('does not add un-matching issues with multiple label filters', async () => {
+    mockGetInput({
+      'project-url': 'https://github.com/orgs/github/projects/1',
+      'github-token': 'gh_token',
+      labeled: 'accessibility,backend,bug'
+    })
+
+    github.context.payload = {
+      issue: {
+        number: 1,
+        labels: [{name: 'data'}, {name: 'frontend'}, {name: 'improvement'}]
+      }
+    }
+
+    const infoSpy = jest.spyOn(core, 'info')
+    const gqlMock = mockGraphQL()
+    await addToProject()
+    expect(infoSpy).toHaveBeenCalledWith(
+      `Skipping issue 1 because it does not have one of the labels: accessibility, backend, bug`
+    )
+    expect(gqlMock).not.toHaveBeenCalled()
+  })
+
   test('does not add un-matching issues with a label filter', async () => {
     mockGetInput({
       'project-url': 'https://github.com/orgs/github/projects/1',
@@ -114,6 +183,50 @@ describe('addToProject', () => {
     expect(infoSpy).toHaveBeenCalledWith(`Skipping issue 1 because it does not have one of the labels: bug`)
     expect(gqlMock).not.toHaveBeenCalled()
   })
+
+  test(`throws an error when url isn't a valid project url`, async () => {
+    mockGetInput({
+      'project-url': 'https://github.com/orgs/github/repositories',
+      'github-token': 'gh_token'
+    })
+
+    github.context.payload = {
+      issue: {
+        number: 1,
+        labels: []
+      }
+    }
+
+    const infoSpy = jest.spyOn(core, 'info')
+    const gqlMock = mockGraphQL()
+    await expect(addToProject()).rejects.toThrow(
+      'https://github.com/orgs/github/repositories. Project URL should match the format https://github.com/<orgs-or-users>/<ownerName>/projects/<projectNumber>'
+    )
+    expect(infoSpy).not.toHaveBeenCalled()
+    expect(gqlMock).not.toHaveBeenCalled()
+  })
+})
+
+test(`throws an error when url isn't under the github.com domain`, async () => {
+  mockGetInput({
+    'project-url': 'https://notgithub.com/orgs/github/projects/1',
+    'github-token': 'gh_token'
+  })
+
+  github.context.payload = {
+    issue: {
+      number: 1,
+      labels: []
+    }
+  }
+
+  const infoSpy = jest.spyOn(core, 'info')
+  const gqlMock = mockGraphQL()
+  await expect(addToProject()).rejects.toThrow(
+    'https://notgithub.com/orgs/github/projects/1. Project URL should match the format https://github.com/<orgs-or-users>/<ownerName>/projects/<projectNumber>'
+  )
+  expect(infoSpy).not.toHaveBeenCalled()
+  expect(gqlMock).not.toHaveBeenCalled()
 })
 
 function mockGetInput(mocks: Record<string, string>): jest.SpyInstance {
