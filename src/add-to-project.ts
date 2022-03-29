@@ -115,7 +115,7 @@ export async function addToProject(): Promise<void> {
   core.setOutput('itemId', addResp.addProjectNextItem.projectNextItem.id)
 }
 
-function mustGetOwnerTypeQuery(ownerType?: string): 'organization' | 'user' {
+export function mustGetOwnerTypeQuery(ownerType?: string): 'organization' | 'user' {
   const ownerTypeQuery = ownerType === 'orgs' ? 'organization' : ownerType === 'users' ? 'user' : null
 
   if (!ownerTypeQuery) {

@@ -1,6 +1,6 @@
 import * as core from '@actions/core'
 import * as github from '@actions/github'
-import {addToProject} from '../src/add-to-project'
+import {addToProject, mustGetOwnerTypeQuery} from '../src/add-to-project'
 
 describe('addToProject', () => {
   let outputs: Record<string, string>
@@ -61,6 +61,49 @@ describe('addToProject', () => {
 
     github.context.payload = {
       issue: {
+        number: 1,
+        labels: [{name: 'bug'}]
+      }
+    }
+
+    mockGraphQL(
+      {
+        test: /getProject/,
+        return: {
+          organization: {
+            projectNext: {
+              id: 'project-next-id'
+            }
+          }
+        }
+      },
+      {
+        test: /addProjectNextItem/,
+        return: {
+          addProjectNextItem: {
+            projectNextItem: {
+              id: 'project-next-item-id'
+            }
+          }
+        }
+      }
+    )
+
+    await addToProject()
+
+    expect(outputs.itemId).toEqual('project-next-item-id')
+  })
+
+  test('adds matching pull-requests with a label filter without label-operator', async () => {
+    mockGetInput({
+      'project-url': 'https://github.com/orgs/github/projects/1',
+      'github-token': 'gh_token',
+      labeled: 'bug, new'
+    })
+
+    github.context.payload = {
+      // eslint-disable-next-line camelcase
+      pull_request: {
         number: 1,
         labels: [{name: 'bug'}]
       }
@@ -230,7 +273,7 @@ describe('addToProject', () => {
     mockGetInput({
       'project-url': 'https://github.com/orgs/github/projects/1',
       'github-token': 'gh_token',
-      labeled: 'accessibility,backend,bug'
+      labeled: 'accessibility, backend, bug'
     })
 
     github.context.payload = {
@@ -247,6 +290,53 @@ describe('addToProject', () => {
       `Skipping issue 1 because it does not have one of the labels: accessibility, backend, bug`
     )
     expect(gqlMock).not.toHaveBeenCalled()
+  })
+
+  test('handles spaces and extra commas gracefully in label filter input', async () => {
+    mockGetInput({
+      'project-url': 'https://github.com/orgs/github/projects/1',
+      'github-token': 'gh_token',
+      labeled: 'accessibility  ,   backend    ,,  . ,     bug'
+    })
+
+    github.context.payload = {
+      issue: {
+        number: 1,
+        labels: [{name: 'accessibility'}, {name: 'backend'}, {name: 'bug'}],
+        'label-operator': 'AND'
+      }
+    }
+
+    const gqlMock = mockGraphQL(
+      {
+        test: /getProject/,
+        return: {
+          organization: {
+            projectNext: {
+              id: 'project-next-id'
+            }
+          }
+        }
+      },
+      {
+        test: /addProjectNextItem/,
+        return: {
+          addProjectNextItem: {
+            projectNextItem: {
+              id: 'project-next-item-id'
+            }
+          }
+        }
+      }
+    )
+
+    const infoSpy = jest.spyOn(core, 'info')
+
+    await addToProject()
+
+    expect(gqlMock).toHaveBeenCalled()
+    expect(infoSpy).not.toHaveBeenCalled()
+    expect(outputs.itemId).toEqual('project-next-item-id')
   })
 
   test(`throws an error when url isn't a valid project url`, async () => {
@@ -381,6 +471,26 @@ describe('addToProject', () => {
       ownerName: 'monalisa',
       projectNumber: 1
     })
+  })
+})
+
+describe('mustGetOwnerTypeQuery', () => {
+  test('returns organization for orgs ownerType', async () => {
+    const ownerTypeQuery = mustGetOwnerTypeQuery('orgs')
+
+    expect(ownerTypeQuery).toEqual('organization')
+  })
+
+  test('returns user for users ownerType', async () => {
+    const ownerTypeQuery = mustGetOwnerTypeQuery('users')
+
+    expect(ownerTypeQuery).toEqual('user')
+  })
+
+  test('throws an error when an unsupported ownerType is set', async () => {
+    expect(() => {
+      mustGetOwnerTypeQuery('unknown')
+    }).toThrow(`Unsupported ownerType: unknown. Must be one of 'orgs' or 'users'`)
   })
 })
 
