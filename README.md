@@ -65,6 +65,8 @@ jobs:
 
 ## Supported Events
 
+> **NOTE:** This Action (currently) only supports auto-adding Issues to a Project which lives in the same organization as your target repo.
+
 Currently this action supports the following [`issues` events](https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#issues):
 
 - `opened`
