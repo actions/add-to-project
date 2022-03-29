@@ -1,6 +1,6 @@
 # actions/add-to-project
 
-Use this action to automatically add the current issue to a GitHub Project.
+Use this action to automatically add the current issue or pull request to a GitHub Project.
 Note that this is for [GitHub Projects
 (beta)](https://docs.github.com/en/issues/trying-out-the-new-projects-experience/about-projects),
 not the original GitHub Projects.
@@ -65,13 +65,18 @@ jobs:
 
 ## Supported Events
 
-Currently this action supports the following [issue events](https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#issues):
+Currently this action supports the following [`issues` events](https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#issues):
 
 - `opened`
 - `transferred`
 - `labeled`
 
-This ensures that all issues in the workflow's repo are added to the [specified project](#project-url). If [labeled input(s)](#labeled) are defined, then issues will only be added if they contain at least _one_ of the labels in the list.
+and the following [`pull_request` events](https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#pull_request):
+
+- `opened`
+- `labeled`
+
+Using these events ensure that a given issue or pull request, in the workflow's repo, is added to the [specified project](#project-url). If [labeled input(s)](#labeled) are defined, then issues will only be added if they contain at least _one_ of the labels in the list.
 
 ## How to point the action to a specific branch or commit sha
 
