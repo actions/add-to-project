@@ -1,5 +1,5 @@
-name: Add to Project
-description: Automatically add issues and PRs to GitHub projects
+name: Add To Github Projects Beta
+description: Automatically add issues and PRs to GitHub projects beta
 author: GitHub
 inputs:
   project-url:
