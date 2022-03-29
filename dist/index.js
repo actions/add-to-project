@@ -35,7 +35,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.addToProject = void 0;
+exports.mustGetOwnerTypeQuery = exports.addToProject = void 0;
 const core = __importStar(__nccwpck_require__(2186));
 const github = __importStar(__nccwpck_require__(5438));
 // TODO: Ensure this (and the Octokit client) works for non-github.com URLs, as well.
@@ -119,6 +119,7 @@ function mustGetOwnerTypeQuery(ownerType) {
     }
     return ownerTypeQuery;
 }
+exports.mustGetOwnerTypeQuery = mustGetOwnerTypeQuery;
 
 
 /***/ }),
