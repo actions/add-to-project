@@ -9,8 +9,7 @@ not the original GitHub Projects.
 
 [![build-test](https://github.com/actions/add-to-project/actions/workflows/test.yml/badge.svg)](https://github.com/actions/add-to-project/actions/workflows/test.yml)
 
-🚨 **This action is a work-in-progress. Please do not use it except for
-experimentation until a release has been prepared.** 🚨
+🚨 **This action is in beta, however the api is stable. Some breaking change might be added between versions, but it is not likley to break as long as you use a speicifc sha or version number ** 🚨
 
 ## Usage
 
