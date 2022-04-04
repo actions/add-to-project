@@ -1,6 +1,8 @@
 name: Add To GitHub Projects Beta
 description: Automatically add issues and PRs to GitHub projects beta
 author: GitHub
+branding:
+  icon: table
 inputs:
   project-url:
     required: true
