@@ -48,10 +48,10 @@ jobs:
 
 ##### Example Usage: Pull Requests labeled with `needs-review` and `size/XL`
 ```yaml
-name: Add needs-review and size/XL PRs to projects
+name: Add needs-review and size/XL pull requests to projects
 
 on:
-  pull_requests:
+  pull_request:
     types:
       - labeled
 
