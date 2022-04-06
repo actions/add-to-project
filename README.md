@@ -1,9 +1,9 @@
 # actions/add-to-project
 
-Use this action to automatically add the current issue or pull request to a GitHub Project.
-Note that this is for [GitHub Projects
+Use this action to automatically add the current issue or pull request to a GitHub project.
+Note that this is for [GitHub projects
 (beta)](https://docs.github.com/en/issues/trying-out-the-new-projects-experience/about-projects),
-not the original GitHub Projects.
+not the original GitHub projects.
 
 ## Current Status
 
@@ -80,7 +80,7 @@ jobs:
 
 ## Inputs
 
-- <a name="project-url">`project-url`</a> **(required)** is the URL of the GitHub Project to add issues to.  
+- <a name="project-url">`project-url`</a> **(required)** is the URL of the GitHub project to add issues to.  
   _eg: `https://github.com/orgs|users/<ownerName>/projects/<projectNumber>`_
 - <a name="github-token">`github-token`</a> **(required)** is a [personal access
   token](https://github.com/settings/tokens/new) with the `repo`, `write:org` and
