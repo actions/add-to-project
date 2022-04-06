@@ -19,7 +19,7 @@ _See [action.yml](action.yml) for [metadata](https://docs.github.com/en/actions/
 
 _For more information about workflows, see [Using workflows](https://docs.github.com/en/actions/using-workflows)._
 
-Create a workflow that runs when Issues or Pull Requests are opened or labeled in your repository; this workflow also supports adding Issues which are transferred into your repository. Optionally configure any filters you may want to add, such as only adding issues with certain labels, you may match labels with an `AND` or an `OR` operator.
+Create a workflow that runs when Issues or Pull Requests are opened or labeled in your repository; this workflow also supports adding Issues to your project which are transferred into your repository. Optionally configure any filters you may want to add, such as only adding issues with certain labels, you may match labels with an `AND` or an `OR` operator.
 
 Once you've configured your workflow, save it as a `.yml` file in your target Repository's `.github/workflows` directory. 
 
