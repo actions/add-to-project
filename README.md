@@ -11,16 +11,19 @@ not the original GitHub projects.
 
 🚨 **This action is in beta, however the API is stable. Some breaking changes might occur between versions, but it is not likely to break as long as you use a specific SHA or version number** 🚨
 
+> **NOTE:** This Action (currently) only supports auto-adding Issues to a Project which lives in the same organization as your target Repository.
+
 ## Usage
 
 _See [action.yml](action.yml) for [metadata](https://docs.github.com/en/actions/creating-actions/metadata-syntax-for-github-actions) that defines the inputs, outputs, and runs configuration for this action._
 
 _For more information about workflows, see [Using workflows](https://docs.github.com/en/actions/using-workflows)._
 
-To use the action, create a workflow that runs when issues are opened in your
-repository. Run this action in a step, optionally configuring any filters you
-may want to add, such as only adding issues with certain labels. If you want to match all the labels, add `label-operator` input to be `AND`.
+Create a workflow that runs when Issues or Pull Requests are opened or labeled in your repository; this workflow also supports adding Issues to your project which are transferred into your repository. Optionally configure any filters you may want to add, such as only adding issues with certain labels, you may match labels with an `AND` or an `OR` operator.
 
+Once you've configured your workflow, save it as a `.yml` file in your target Repository's `.github/workflows` directory. 
+
+##### Example Usage: Issue opened with labels `bug` OR `needs-triage`
 ```yaml
 name: Add bugs to bugs project
 
@@ -38,9 +41,33 @@ jobs:
         with:
           project-url: https://github.com/orgs/<orgName>/projects/<projectNumber>
           github-token: ${{ secrets.ADD_TO_PROJECT_PAT }}
-          labeled: bug, new
+          labeled: bug, needs-triage
+          label-operator: OR
+```
+
+
+##### Example Usage: Pull Requests labeled with `needs-review` and `size/XL`
+```yaml
+name: Add needs-review and size/XL PRs to projects
+
+on:
+  pull_requests:
+    types:
+      - labeled
+
+jobs:
+  add-to-project:
+    name: Add issue to project
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/add-to-project@main
+        with:
+          project-url: https://github.com/orgs/<orgName>/projects/<projectNumber>
+          github-token: ${{ secrets.ADD_TO_PROJECT_PAT }}
+          labeled: needs-review, size/XL
           label-operator: AND
 ```
+
 
 #### Further reading and additional resources
 
@@ -63,8 +90,6 @@ jobs:
 - <a name="labeled">`label-operator`</a> **(optional)** is the behavior of the labels filter, either `AND` or `OR` that controls if the issue should be matched with `all` `labeled` input or any of them, default is `OR`.
 
 ## Supported Events
-
-> **NOTE:** This Action (currently) only supports auto-adding Issues to a project which lives in the same organization as your target repo.
 
 Currently this action supports the following [`issues` events](https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#issues):
 
