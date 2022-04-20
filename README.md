@@ -21,9 +21,10 @@ _For more information about workflows, see [Using workflows](https://docs.github
 
 Create a workflow that runs when Issues or Pull Requests are opened or labeled in your repository; this workflow also supports adding Issues to your project which are transferred into your repository. Optionally configure any filters you may want to add, such as only adding issues with certain labels, you may match labels with an `AND` or an `OR` operator.
 
-Once you've configured your workflow, save it as a `.yml` file in your target Repository's `.github/workflows` directory. 
+Once you've configured your workflow, save it as a `.yml` file in your target Repository's `.github/workflows` directory.
 
 ##### Example Usage: Issue opened with labels `bug` OR `needs-triage`
+
 ```yaml
 name: Add bugs to bugs project
 
@@ -45,8 +46,8 @@ jobs:
           label-operator: OR
 ```
 
-
 ##### Example Usage: Pull Requests labeled with `needs-review` and `size/XL`
+
 ```yaml
 name: Add needs-review and size/XL pull requests to projects
 
@@ -67,7 +68,6 @@ jobs:
           labeled: needs-review, size/XL
           label-operator: AND
 ```
-
 
 #### Further reading and additional resources
 
