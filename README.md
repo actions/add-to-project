@@ -9,9 +9,9 @@ not the original GitHub projects.
 
 [![build-test](https://github.com/actions/add-to-project/actions/workflows/test.yml/badge.svg)](https://github.com/actions/add-to-project/actions/workflows/test.yml)
 
-🚨 **This action is in beta, however the API is stable. Some breaking changes might occur between versions, but it is not likely to break as long as you use a specific SHA or version number** 🚨
+> **NOTE:** This Action (currently) only supports auto-adding Issues/Pull Requests to a Project which lives in the same organization as your target Repository.
 
-> **NOTE:** This Action (currently) only supports auto-adding Issues to a Project which lives in the same organization as your target Repository.
+> **NOTE:** This action no longer uses the deprecated ProjectNext API. If you are looking for the old version of that action, please check `project_next` branch.
 
 ## Usage
 
@@ -80,11 +80,10 @@ jobs:
 
 ## Inputs
 
-- <a name="project-url">`project-url`</a> **(required)** is the URL of the GitHub project to add issues to.  
+- <a name="project-url">`project-url`</a> **(required)** is the URL of the GitHub project to add issues to.
   _eg: `https://github.com/orgs|users/<ownerName>/projects/<projectNumber>`_
 - <a name="github-token">`github-token`</a> **(required)** is a [personal access
-  token](https://github.com/settings/tokens/new) with the `repo`, `write:org` and
-  `read:org` scopes.  
+  token](https://github.com/settings/tokens/new) with the `project` scope.
   _See [Creating a PAT and adding it to your repository](#creating-a-pat-and-adding-it-to-your-repository) for more details_
 - <a name="labeled">`labeled`</a> **(optional)** is a comma-separated list of labels used to filter applicable issues. When this key is provided, an issue must have _one_ of the labels in the list to be added to the project. Omitting this key means that any issue will be added.
 - <a name="labeled">`label-operator`</a> **(optional)** is the behavior of the labels filter, either `AND` or `OR` that controls if the issue should be matched with `all` `labeled` input or any of them, default is `OR`.
@@ -138,10 +137,10 @@ jobs:
 
 - create a new [personal access
   token](https://github.com/settings/tokens/new) with `repo`, `write:org` and
-  `read:org` scopes  
+  `read:org` scopes
   _See [Creating a personal access token](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token) for more information_
 
-- add the newly created PAT as a repository secret, this secret will be referenced by the [github-token input](#github-token)  
+- add the newly created PAT as a repository secret, this secret will be referenced by the [github-token input](#github-token)
   _See [Encrypted secrets](https://docs.github.com/en/actions/security-guides/encrypted-secrets#creating-encrypted-secrets-for-a-repository) for more information_
 
 ## Development

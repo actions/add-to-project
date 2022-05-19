@@ -8,21 +8,21 @@ const urlParse =
 
 interface ProjectNodeIDResponse {
   organization?: {
-    projectNext: {
+    projectV2: {
       id: string
     }
   }
 
   user?: {
-    projectNext: {
+    projectV2: {
       id: string
     }
   }
 }
 
 interface ProjectAddItemResponse {
-  addProjectNextItem: {
-    projectNextItem: {
+  addProjectV2ItemById: {
+    projectItem: {
       id: string
     }
   }
@@ -40,6 +40,7 @@ export async function addToProject(): Promise<void> {
   const labelOperator = core.getInput('label-operator').trim().toLocaleLowerCase()
 
   const octokit = github.getOctokit(ghToken)
+
   const urlMatch = projectUrl.match(urlParse)
   const issue = github.context.payload.issue ?? github.context.payload.pull_request
   const issueLabels: string[] = (issue?.labels ?? []).map((l: {name: string}) => l.name)
@@ -76,20 +77,21 @@ export async function addToProject(): Promise<void> {
 
   // First, use the GraphQL API to request the project's node ID.
   const idResp = await octokit.graphql<ProjectNodeIDResponse>(
-    `query getProject($ownerName: String!, $projectNumber: Int!) { 
+    `query getProject($ownerName: String!, $projectNumber: Int!) {
       ${ownerTypeQuery}(login: $ownerName) {
-        projectNext(number: $projectNumber) {
+        projectV2(number: $projectNumber) {
           id
         }
       }
     }`,
     {
       ownerName,
-      projectNumber
+      projectNumber,
+      headers: {'GraphQL-Features': 'memex_graphql_projectv2'}
     }
   )
 
-  const projectId = idResp[ownerTypeQuery]?.projectNext.id
+  const projectId = idResp[ownerTypeQuery]?.projectV2.id
   const contentId = issue?.node_id
 
   core.debug(`Project node ID: ${projectId}`)
@@ -97,22 +99,23 @@ export async function addToProject(): Promise<void> {
 
   // Next, use the GraphQL API to add the issue to the project.
   const addResp = await octokit.graphql<ProjectAddItemResponse>(
-    `mutation addIssueToProject($input: AddProjectNextItemInput!) {
-      addProjectNextItem(input: $input) {
-        projectNextItem {
+    `mutation addIssueToProject($input: AddProjectV2ItemByIdInput!) {
+      addProjectV2ItemById(input: $input) {
+        projectItem {
           id
         }
       }
     }`,
     {
       input: {
+        projectId,
         contentId,
-        projectId
+        headers: {'GraphQL-Features': 'memex_graphql_projectv2'}
       }
     }
   )
 
-  core.setOutput('itemId', addResp.addProjectNextItem.projectNextItem.id)
+  core.setOutput('itemId', addResp.addProjectV2ItemById.projectItem.id)
 }
 
 export function mustGetOwnerTypeQuery(ownerType?: string): 'organization' | 'user' {
