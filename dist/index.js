@@ -110,9 +110,9 @@ function addToProject() {
     }`, {
             input: {
                 projectId,
-                contentId,
-                headers: { 'GraphQL-Features': 'memex_graphql_projectv2' }
-            }
+                contentId
+            },
+            headers: { 'GraphQL-Features': 'memex_graphql_projectv2' }
         });
         core.setOutput('itemId', addResp.addProjectV2ItemById.projectItem.id);
     });
