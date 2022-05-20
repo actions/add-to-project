@@ -85,34 +85,36 @@ function addToProject() {
         core.debug(`Project number: ${projectNumber}`);
         core.debug(`Owner type: ${ownerType}`);
         // First, use the GraphQL API to request the project's node ID.
-        const idResp = yield octokit.graphql(`query getProject($ownerName: String!, $projectNumber: Int!) { 
+        const idResp = yield octokit.graphql(`query getProject($ownerName: String!, $projectNumber: Int!) {
       ${ownerTypeQuery}(login: $ownerName) {
-        projectNext(number: $projectNumber) {
+        projectV2(number: $projectNumber) {
           id
         }
       }
     }`, {
             ownerName,
-            projectNumber
+            projectNumber,
+            headers: { 'GraphQL-Features': 'memex_graphql_projectv2' }
         });
-        const projectId = (_h = idResp[ownerTypeQuery]) === null || _h === void 0 ? void 0 : _h.projectNext.id;
+        const projectId = (_h = idResp[ownerTypeQuery]) === null || _h === void 0 ? void 0 : _h.projectV2.id;
         const contentId = issue === null || issue === void 0 ? void 0 : issue.node_id;
         core.debug(`Project node ID: ${projectId}`);
         core.debug(`Content ID: ${contentId}`);
         // Next, use the GraphQL API to add the issue to the project.
-        const addResp = yield octokit.graphql(`mutation addIssueToProject($input: AddProjectNextItemInput!) {
-      addProjectNextItem(input: $input) {
-        projectNextItem {
+        const addResp = yield octokit.graphql(`mutation addIssueToProject($input: AddProjectV2ItemByIdInput!) {
+      addProjectV2ItemById(input: $input) {
+        projectItem {
           id
         }
       }
     }`, {
             input: {
+                projectId,
                 contentId,
-                projectId
+                headers: { 'GraphQL-Features': 'memex_graphql_projectv2' }
             }
         });
-        core.setOutput('itemId', addResp.addProjectNextItem.projectNextItem.id);
+        core.setOutput('itemId', addResp.addProjectV2ItemById.projectItem.id);
     });
 }
 exports.addToProject = addToProject;
