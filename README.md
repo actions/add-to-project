@@ -11,7 +11,7 @@ not the original GitHub projects.
 
 > **NOTE:** This Action (currently) only supports auto-adding Issues/Pull Requests to a Project which lives in the same organization as your target Repository.
 
-> **NOTE:** This action no longer uses the deprecated ProjectNext API. If you are looking for the old version of that action, please check `project_next` branch.
+> **NOTE:** This action no longer uses the deprecated ProjectNext API. If you are looking for the old version of that action, use version [v0.0.3](https://github.com/actions/add-to-project/releases/tag/v0.0.3).
 
 ## Usage
 
@@ -23,7 +23,9 @@ Create a workflow that runs when Issues or Pull Requests are opened or labeled i
 
 Once you've configured your workflow, save it as a `.yml` file in your target Repository's `.github/workflows` directory.
 
-##### Example Usage: Issue opened with labels `bug` OR `needs-triage`
+### Examples
+
+#### Example Usage: Issue opened with labels `bug` OR `needs-triage`
 
 ```yaml
 name: Add bugs to bugs project
@@ -38,7 +40,7 @@ jobs:
     name: Add issue to project
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/add-to-project@main
+      - uses: actions/add-to-project@RELEASE_VERSION
         with:
           project-url: https://github.com/orgs/<orgName>/projects/<projectNumber>
           github-token: ${{ secrets.ADD_TO_PROJECT_PAT }}
@@ -46,7 +48,7 @@ jobs:
           label-operator: OR
 ```
 
-##### Example Usage: Pull Requests labeled with `needs-review` and `size/XL`
+#### Example Usage: Pull Requests labeled with `needs-review` and `size/XL`
 
 ```yaml
 name: Add needs-review and size/XL pull requests to projects
@@ -61,7 +63,7 @@ jobs:
     name: Add issue to project
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/add-to-project@main
+      - uses: actions/add-to-project@RELEASE_VERSION
         with:
           project-url: https://github.com/orgs/<orgName>/projects/<projectNumber>
           github-token: ${{ secrets.ADD_TO_PROJECT_PAT }}
@@ -69,14 +71,21 @@ jobs:
           label-operator: AND
 ```
 
-#### Further reading and additional resources
+### Further reading and additional resources
 
-- [Inputs](#inputs)
-- [Supported Events](#supported-events)
-- [How to point the action to a specific branch or commit sha](#how-to-point-the-action-to-a-specific-branch-or-commit-sha)
-- [Creating a PAT and adding it to your repository](#creating-a-pat-and-adding-it-to-your-repository)
-- [Development](#development)
-- [Publish to a distribution branch](#publish-to-a-distribution-branch)
+- [actions/add-to-project](#actionsadd-to-project)
+  - [Current Status](#current-status)
+  - [Usage](#usage)
+    - [Examples](#examples)
+      - [Example Usage: Issue opened with labels `bug` OR `needs-triage`](#example-usage-issue-opened-with-labels-bug-or-needs-triage)
+      - [Example Usage: Pull Requests labeled with `needs-review` and `size/XL`](#example-usage-pull-requests-labeled-with-needs-review-and-sizexl)
+    - [Further reading and additional resources](#further-reading-and-additional-resources)
+  - [Inputs](#inputs)
+  - [Supported Events](#supported-events)
+  - [Creating a PAT and adding it to your repository](#creating-a-pat-and-adding-it-to-your-repository)
+  - [Development](#development)
+  - [Publish to a distribution branch](#publish-to-a-distribution-branch)
+- [License](#license)
 
 ## Inputs
 
@@ -102,36 +111,6 @@ and the following [`pull_request` events](https://docs.github.com/en/actions/usi
 - `labeled`
 
 Using these events ensure that a given issue or pull request, in the workflow's repo, is added to the [specified project](#project-url). If [labeled input(s)](#labeled) are defined, then issues will only be added if they contain at least _one_ of the labels in the list.
-
-## How to point the action to a specific branch or commit sha
-
-Pointing to a branch name generally isn't the safest way to refer to an action, but this is how you can use this action now before we've begun creating releases.
-
-```yaml
-jobs:
-  add-to-project:
-    name: Add issue to project
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/add-to-project@main
-        with:
-          project-url: https://github.com/orgs/<orgName>/projects/<projectNumber>
-          github-token: ${{ secrets.ADD_TO_PROJECT_PAT }}
-```
-
-Another option would be to point to a full [commit SHA](https://docs.github.com/en/get-started/quickstart/github-glossary#commit):
-
-```yaml
-jobs:
-  add-to-project:
-    name: Add issue to project
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/add-to-project@<commitSHA>
-        with:
-          project-url: https://github.com/orgs/<orgName>/projects/<projectNumber>
-          github-token: ${{ secrets.ADD_TO_PROJECT_PAT }}
-```
 
 ## Creating a PAT and adding it to your repository
 

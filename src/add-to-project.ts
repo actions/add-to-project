@@ -86,8 +86,7 @@ export async function addToProject(): Promise<void> {
     }`,
     {
       ownerName,
-      projectNumber,
-      headers: {'GraphQL-Features': 'memex_graphql_projectv2'}
+      projectNumber
     }
   )
 
@@ -110,8 +109,7 @@ export async function addToProject(): Promise<void> {
       input: {
         projectId,
         contentId
-      },
-      headers: {'GraphQL-Features': 'memex_graphql_projectv2'}
+      }
     }
   )
 

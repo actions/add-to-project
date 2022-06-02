@@ -425,8 +425,7 @@ describe('addToProject', () => {
 
     expect(gqlMock).toHaveBeenNthCalledWith(1, expect.stringContaining('organization(login: $ownerName)'), {
       ownerName: 'github',
-      projectNumber: 1,
-      headers: {'GraphQL-Features': 'memex_graphql_projectv2'}
+      projectNumber: 1
     })
   })
 
@@ -471,8 +470,7 @@ describe('addToProject', () => {
 
     expect(gqlMock).toHaveBeenNthCalledWith(1, expect.stringContaining('user(login: $ownerName)'), {
       ownerName: 'monalisa',
-      projectNumber: 1,
-      headers: {'GraphQL-Features': 'memex_graphql_projectv2'}
+      projectNumber: 1
     })
   })
 })
