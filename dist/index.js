@@ -93,8 +93,7 @@ function addToProject() {
       }
     }`, {
             ownerName,
-            projectNumber,
-            headers: { 'GraphQL-Features': 'memex_graphql_projectv2' }
+            projectNumber
         });
         const projectId = (_h = idResp[ownerTypeQuery]) === null || _h === void 0 ? void 0 : _h.projectV2.id;
         const contentId = issue === null || issue === void 0 ? void 0 : issue.node_id;
@@ -111,8 +110,7 @@ function addToProject() {
             input: {
                 projectId,
                 contentId
-            },
-            headers: { 'GraphQL-Features': 'memex_graphql_projectv2' }
+            }
         });
         core.setOutput('itemId', addResp.addProjectV2ItemById.projectItem.id);
     });
