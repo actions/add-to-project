@@ -223,6 +223,28 @@ describe('addToProject', () => {
     expect(gqlMock).not.toHaveBeenCalled()
   })
 
+  test('does not add matching issues with labels filter with NOT label-operator', async () => {
+    mockGetInput({
+      'project-url': 'https://github.com/orgs/github/projects/1',
+      'github-token': 'gh_token',
+      labeled: 'bug, new',
+      'label-operator': 'NOT'
+    })
+
+    github.context.payload = {
+      issue: {
+        number: 1,
+        labels: [{name: 'bug'}]
+      }
+    }
+
+    const infoSpy = jest.spyOn(core, 'info')
+    const gqlMock = mockGraphQL()
+    await addToProject()
+    expect(infoSpy).toHaveBeenCalledWith(`Skipping issue 1 because it contains one of the labels: bug, new`)
+    expect(gqlMock).not.toHaveBeenCalled()
+  })
+
   test('adds matching issues with multiple label filters', async () => {
     mockGetInput({
       'project-url': 'https://github.com/orgs/github/projects/1',
