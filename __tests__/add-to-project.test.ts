@@ -245,6 +245,49 @@ describe('addToProject', () => {
     expect(gqlMock).not.toHaveBeenCalled()
   })
 
+  test('adds issues that do not have labels present in the label list with NOT label-operator', async () => {
+    mockGetInput({
+      'project-url': 'https://github.com/orgs/github/projects/1',
+      'github-token': 'gh_token',
+      labeled: 'bug, new',
+      'label-operator': 'NOT'
+    })
+
+    github.context.payload = {
+      issue: {
+        number: 1,
+        labels: [{name: 'other'}]
+      }
+    }
+
+    mockGraphQL(
+      {
+        test: /getProject/,
+        return: {
+          organization: {
+            projectNext: {
+              id: 'project-next-id'
+            }
+          }
+        }
+      },
+      {
+        test: /addProjectNextItem/,
+        return: {
+          addProjectNextItem: {
+            projectNextItem: {
+              id: 'project-next-item-id'
+            }
+          }
+        }
+      }
+    )
+
+    await addToProject()
+
+    expect(outputs.itemId).toEqual('project-next-item-id')
+  })
+
   test('adds matching issues with multiple label filters', async () => {
     mockGetInput({
       'project-url': 'https://github.com/orgs/github/projects/1',
