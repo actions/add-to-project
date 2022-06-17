@@ -44,6 +44,29 @@ jobs:
           github-token: ${{ secrets.ADD_TO_PROJECT_PAT }}
           labeled: bug, needs-triage
           label-operator: OR
+
+```
+##### Example Usage: Adds all issues opened that do not include the label `bug` OR `needs-triage`
+
+```yaml
+name: Adds all issues that don't include the 'bug' or 'needs-triage' labels to project board
+
+on:
+  issues:
+    types:
+      - opened
+
+jobs:
+  add-to-project:
+    name: Add issue to project
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/add-to-project@main
+        with:
+          project-url: https://github.com/orgs/<orgName>/projects/<projectNumber>
+          github-token: ${{ secrets.ADD_TO_PROJECT_PAT }}
+          labeled: bug, needs-triage
+          label-operator: NOT
 ```
 
 ##### Example Usage: Pull Requests labeled with `needs-review` and `size/XL`
