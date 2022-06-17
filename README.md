@@ -44,8 +44,8 @@ jobs:
           github-token: ${{ secrets.ADD_TO_PROJECT_PAT }}
           labeled: bug, needs-triage
           label-operator: OR
-
 ```
+
 ##### Example Usage: Adds all issues opened that do not include the label `bug` OR `needs-triage`
 
 ```yaml
