@@ -15,7 +15,7 @@ inputs:
     description: A comma-separated list of labels to use as a filter for issue to be added
   label-operator:
     required: false
-    description: The behavior of the labels filter, AND to match all labels, OR to match any label (default is OR)
+    description: The behavior of the labels filter, AND to match all labels, OR to match any label, NOT to exclude any listed label (default is OR)
 runs:
   using: 'node16'
   main: 'dist/index.js'
