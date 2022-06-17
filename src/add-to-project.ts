@@ -50,14 +50,14 @@ export async function addToProject(): Promise<void> {
       core.info(`Skipping issue ${issue?.number} because it doesn't match all the labels: ${labeled.join(', ')}`)
       return
     }
-  } else if (labelOperator === 'or') {
-    if (labeled.length > 0 && !issueLabels.some(l => labeled.includes(l))) {
-      core.info(`Skipping issue ${issue?.number} because it does not have one of the labels: ${labeled.join(', ')}`)
-      return
-    }
   } else if (labelOperator === 'not') {
     if (labeled.length > 0 && issueLabels.some(l => labeled.includes(l))) {
       core.info(`Skipping issue ${issue?.number} because it contains one of the labels: ${labeled.join(', ')}`)
+      return
+    }
+  } else {
+    if (labeled.length > 0 && !issueLabels.some(l => labeled.includes(l))) {
+      core.info(`Skipping issue ${issue?.number} because it does not have one of the labels: ${labeled.join(', ')}`)
       return
     }
   }
