@@ -549,7 +549,7 @@ describe('addToProject', () => {
     github.context.payload = {
       issue: {
         number: 1,
-        labels: [{ name: 'foo' }, { name: 'BAR' }, { name: 'baz' }]
+        labels: [{name: 'foo'}, {name: 'BAR'}, {name: 'baz'}]
       }
     }
 
