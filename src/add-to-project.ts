@@ -35,14 +35,14 @@ export async function addToProject(): Promise<void> {
     core
       .getInput('labeled')
       .split(',')
-      .map(l => l.trim())
+      .map(l => l.trim().toLowerCase())
       .filter(l => l.length > 0) ?? []
   const labelOperator = core.getInput('label-operator').trim().toLocaleLowerCase()
 
   const octokit = github.getOctokit(ghToken)
   const urlMatch = projectUrl.match(urlParse)
   const issue = github.context.payload.issue ?? github.context.payload.pull_request
-  const issueLabels: string[] = (issue?.labels ?? []).map((l: {name: string}) => l.name)
+  const issueLabels: string[] = (issue?.labels ?? []).map((l: { name: string }) => l.name.toLowerCase())
 
   // Ensure the issue matches our `labeled` filter based on the label-operator.
   if (labelOperator === 'and') {
