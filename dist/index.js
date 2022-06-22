@@ -53,13 +53,13 @@ function addToProject() {
         const labeled = (_a = core
             .getInput('labeled')
             .split(',')
-            .map(l => l.trim())
+            .map(l => l.trim().toLowerCase())
             .filter(l => l.length > 0)) !== null && _a !== void 0 ? _a : [];
         const labelOperator = core.getInput('label-operator').trim().toLocaleLowerCase();
         const octokit = github.getOctokit(ghToken);
         const urlMatch = projectUrl.match(urlParse);
         const issue = (_b = github.context.payload.issue) !== null && _b !== void 0 ? _b : github.context.payload.pull_request;
-        const issueLabels = ((_c = issue === null || issue === void 0 ? void 0 : issue.labels) !== null && _c !== void 0 ? _c : []).map((l) => l.name);
+        const issueLabels = ((_c = issue === null || issue === void 0 ? void 0 : issue.labels) !== null && _c !== void 0 ? _c : []).map((l) => l.name.toLowerCase());
         // Ensure the issue matches our `labeled` filter based on the label-operator.
         if (labelOperator === 'and') {
             if (!labeled.every(l => issueLabels.includes(l))) {
