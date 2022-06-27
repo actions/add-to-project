@@ -4,8 +4,8 @@
   "version": "0.1.0",
   "author": "GitHub and contributors",
   "dependencies": {
-    "@actions/core": "^1.6.0",
-    "@actions/github": "^5.0.0"
+    "@actions/core": "^1.9.0",
+    "@actions/github": "^5.0.3"
   },
   "engines": {
     "node": ">=16.0.0 <17.0.0",
@@ -14,18 +14,18 @@
   "devDependencies": {
     "@github/prettier-config": "^0.0.4",
     "@types/jest": "^27.5.0",
-    "@types/node": "~16.11.36",
-    "@typescript-eslint/parser": "^5.25.0",
-    "@vercel/ncc": "^0.33.4",
-    "concurrently": "^7.2.0",
-    "eslint": "^8.15.0",
+    "@types/node": "~16.11.41",
+    "@typescript-eslint/parser": "^5.29.0",
+    "@vercel/ncc": "^0.34.0",
+    "concurrently": "^7.2.2",
+    "eslint": "^8.18.0",
     "eslint-plugin-github": "^4.3.6",
-    "eslint-plugin-jest": "^26.2.2",
+    "eslint-plugin-jest": "^26.5.3",
     "eslint-plugin-prettier": "^4.0.0",
     "jest": "^27.5.1",
-    "prettier": "2.6.2",
+    "prettier": "2.7.1",
     "ts-jest": "^27.1.4",
-    "typescript": "^4.6.4"
+    "typescript": "^4.7.4"
   },
   "keywords": [
     "actions",

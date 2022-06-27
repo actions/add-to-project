@@ -224,6 +224,71 @@ describe('addToProject', () => {
     expect(gqlMock).not.toHaveBeenCalled()
   })
 
+  test('does not add matching issues with labels filter with NOT label-operator', async () => {
+    mockGetInput({
+      'project-url': 'https://github.com/orgs/github/projects/1',
+      'github-token': 'gh_token',
+      labeled: 'bug, new',
+      'label-operator': 'NOT'
+    })
+
+    github.context.payload = {
+      issue: {
+        number: 1,
+        labels: [{name: 'bug'}]
+      }
+    }
+
+    const infoSpy = jest.spyOn(core, 'info')
+    const gqlMock = mockGraphQL()
+    await addToProject()
+    expect(infoSpy).toHaveBeenCalledWith(`Skipping issue 1 because it contains one of the labels: bug, new`)
+    expect(gqlMock).not.toHaveBeenCalled()
+  })
+
+  test('adds issues that do not have labels present in the label list with NOT label-operator', async () => {
+    mockGetInput({
+      'project-url': 'https://github.com/orgs/github/projects/1',
+      'github-token': 'gh_token',
+      labeled: 'bug, new',
+      'label-operator': 'NOT'
+    })
+
+    github.context.payload = {
+      issue: {
+        number: 1,
+        labels: [{name: 'other'}]
+      }
+    }
+
+    mockGraphQL(
+      {
+        test: /getProject/,
+        return: {
+          organization: {
+            projectNext: {
+              id: 'project-next-id'
+            }
+          }
+        }
+      },
+      {
+        test: /addProjectNextItem/,
+        return: {
+          addProjectNextItem: {
+            projectNextItem: {
+              id: 'project-next-item-id'
+            }
+          }
+        }
+      }
+    )
+
+    await addToProject()
+
+    expect(outputs.itemId).toEqual('project-next-item-id')
+  })
+
   test('adds matching issues with multiple label filters', async () => {
     mockGetInput({
       'project-url': 'https://github.com/orgs/github/projects/1',
@@ -472,6 +537,49 @@ describe('addToProject', () => {
       ownerName: 'monalisa',
       projectNumber: 1
     })
+  })
+
+  test('compares labels case-insensitively', async () => {
+    mockGetInput({
+      'project-url': 'https://github.com/orgs/github/projects/1',
+      'github-token': 'gh_token',
+      labeled: 'FOO, Bar, baz',
+      'label-operator': 'AND'
+    })
+
+    github.context.payload = {
+      issue: {
+        number: 1,
+        labels: [{name: 'foo'}, {name: 'BAR'}, {name: 'baz'}]
+      }
+    }
+
+    mockGraphQL(
+      {
+        test: /getProject/,
+        return: {
+          organization: {
+            projectNext: {
+              id: 'project-next-id'
+            }
+          }
+        }
+      },
+      {
+        test: /addProjectNextItem/,
+        return: {
+          addProjectNextItem: {
+            projectNextItem: {
+              id: 'project-next-item-id'
+            }
+          }
+        }
+      }
+    )
+
+    await addToProject()
+
+    expect(outputs.itemId).toEqual('project-next-item-id')
   })
 })
 

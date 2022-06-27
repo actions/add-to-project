@@ -19,7 +19,7 @@ _See [action.yml](action.yml) for [metadata](https://docs.github.com/en/actions/
 
 _For more information about workflows, see [Using workflows](https://docs.github.com/en/actions/using-workflows)._
 
-Create a workflow that runs when Issues or Pull Requests are opened or labeled in your repository; this workflow also supports adding Issues to your project which are transferred into your repository. Optionally configure any filters you may want to add, such as only adding issues with certain labels, you may match labels with an `AND` or an `OR` operator.
+Create a workflow that runs when Issues or Pull Requests are opened or labeled in your repository; this workflow also supports adding Issues to your project which are transferred into your repository. Optionally configure any filters you may want to add, such as only adding issues with certain labels. You may match labels with an `AND` or an `OR` operator, or exclude labels with a `NOT` operator.
 
 Once you've configured your workflow, save it as a `.yml` file in your target Repository's `.github/workflows` directory.
 
@@ -46,6 +46,29 @@ jobs:
           github-token: ${{ secrets.ADD_TO_PROJECT_PAT }}
           labeled: bug, needs-triage
           label-operator: OR
+```
+
+#### Example Usage: Adds all issues opened that do not include the label `bug` OR `needs-triage`
+
+```yaml
+name: Adds all issues that don't include the 'bug' or 'needs-triage' labels to project board
+
+on:
+  issues:
+    types:
+      - opened
+
+jobs:
+  add-to-project:
+    name: Add issue to project
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/add-to-project@main
+        with:
+          project-url: https://github.com/orgs/<orgName>/projects/<projectNumber>
+          github-token: ${{ secrets.ADD_TO_PROJECT_PAT }}
+          labeled: bug, needs-triage
+          label-operator: NOT
 ```
 
 #### Example Usage: Pull Requests labeled with `needs-review` and `size/XL`
@@ -78,6 +101,7 @@ jobs:
   - [Usage](#usage)
     - [Examples](#examples)
       - [Example Usage: Issue opened with labels `bug` OR `needs-triage`](#example-usage-issue-opened-with-labels-bug-or-needs-triage)
+      - [Example Usage: Adds all issues opened that do not include the label `bug` OR `needs-triage`](#example-usage-adds-all-issues-opened-that-do-not-include-the-label-bug-or-needs-triage)
       - [Example Usage: Pull Requests labeled with `needs-review` and `size/XL`](#example-usage-pull-requests-labeled-with-needs-review-and-sizexl)
     - [Further reading and additional resources](#further-reading-and-additional-resources)
   - [Inputs](#inputs)
@@ -95,7 +119,7 @@ jobs:
   token](https://github.com/settings/tokens/new) with the `project` scope.
   _See [Creating a PAT and adding it to your repository](#creating-a-pat-and-adding-it-to-your-repository) for more details_
 - <a name="labeled">`labeled`</a> **(optional)** is a comma-separated list of labels used to filter applicable issues. When this key is provided, an issue must have _one_ of the labels in the list to be added to the project. Omitting this key means that any issue will be added.
-- <a name="labeled">`label-operator`</a> **(optional)** is the behavior of the labels filter, either `AND` or `OR` that controls if the issue should be matched with `all` `labeled` input or any of them, default is `OR`.
+- <a name="labeled">`label-operator`</a> **(optional)** is the behavior of the labels filter, either `AND`, `OR` or `NOT` that controls if the issue should be matched with `all` `labeled` input or any of them, default is `OR`.
 
 ## Supported Events
 
