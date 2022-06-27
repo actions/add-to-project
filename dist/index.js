@@ -102,7 +102,7 @@ function addToProject() {
         // Next, use the GraphQL API to add the issue to the project.
         const addResp = yield octokit.graphql(`mutation addIssueToProject($input: AddProjectV2ItemByIdInput!) {
       addProjectV2ItemById(input: $input) {
-        projectItem {
+        item {
           id
         }
       }
@@ -112,7 +112,7 @@ function addToProject() {
                 contentId
             }
         });
-        core.setOutput('itemId', addResp.addProjectV2ItemById.projectItem.id);
+        core.setOutput('itemId', addResp.addProjectV2ItemById.item.id);
     });
 }
 exports.addToProject = addToProject;
