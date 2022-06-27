@@ -22,7 +22,7 @@ interface ProjectNodeIDResponse {
 
 interface ProjectAddItemResponse {
   addProjectV2ItemById: {
-    projectItem: {
+    item: {
       id: string
     }
   }
@@ -100,7 +100,7 @@ export async function addToProject(): Promise<void> {
   const addResp = await octokit.graphql<ProjectAddItemResponse>(
     `mutation addIssueToProject($input: AddProjectV2ItemByIdInput!) {
       addProjectV2ItemById(input: $input) {
-        projectItem {
+        item {
           id
         }
       }
@@ -113,7 +113,7 @@ export async function addToProject(): Promise<void> {
     }
   )
 
-  core.setOutput('itemId', addResp.addProjectV2ItemById.projectItem.id)
+  core.setOutput('itemId', addResp.addProjectV2ItemById.item.id)
 }
 
 export function mustGetOwnerTypeQuery(ownerType?: string): 'organization' | 'user' {

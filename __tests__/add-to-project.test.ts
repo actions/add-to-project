@@ -40,7 +40,7 @@ describe('addToProject', () => {
         test: /addProjectV2ItemById/,
         return: {
           addProjectV2ItemById: {
-            projectItem: {
+            item: {
               id: 'project-item-id'
             }
           }
@@ -82,7 +82,7 @@ describe('addToProject', () => {
         test: /addProjectV2ItemById/,
         return: {
           addProjectV2ItemById: {
-            projectItem: {
+            item: {
               id: 'project-item-id'
             }
           }
@@ -125,7 +125,7 @@ describe('addToProject', () => {
         test: /addProjectV2ItemById/,
         return: {
           addProjectV2ItemById: {
-            projectItem: {
+            item: {
               id: 'project-item-id'
             }
           }
@@ -189,7 +189,7 @@ describe('addToProject', () => {
         test: /addProjectV2ItemById/,
         return: {
           addProjectV2ItemById: {
-            projectItem: {
+            item: {
               id: 'project-item-id'
             }
           }
@@ -253,7 +253,7 @@ describe('addToProject', () => {
         test: /addProjectV2ItemById/,
         return: {
           addProjectV2ItemById: {
-            projectItem: {
+            item: {
               id: 'project-item-id'
             }
           }
@@ -323,7 +323,7 @@ describe('addToProject', () => {
         test: /addProjectV2ItemById/,
         return: {
           addProjectV2ItemById: {
-            projectItem: {
+            item: {
               id: 'project-item-id'
             }
           }
@@ -413,7 +413,7 @@ describe('addToProject', () => {
         test: /addProjectV2ItemById/,
         return: {
           addProjectV2ItemById: {
-            projectItem: {
+            item: {
               id: 'project-item-id'
             }
           }
@@ -458,7 +458,7 @@ describe('addToProject', () => {
         test: /addProjectV2ItemById/,
         return: {
           addProjectV2ItemById: {
-            projectItem: {
+            item: {
               id: 'project-item-id'
             }
           }
