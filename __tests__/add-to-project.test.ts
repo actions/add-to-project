@@ -1,5 +1,6 @@
 import * as core from '@actions/core'
 import * as github from '@actions/github'
+
 import {addToProject, mustGetOwnerTypeQuery} from '../src/add-to-project'
 
 describe('addToProject', () => {
@@ -29,18 +30,18 @@ describe('addToProject', () => {
         test: /getProject/,
         return: {
           organization: {
-            projectNext: {
-              id: 'project-next-id'
+            projectV2: {
+              id: 'project-id'
             }
           }
         }
       },
       {
-        test: /addProjectNextItem/,
+        test: /addProjectV2ItemById/,
         return: {
-          addProjectNextItem: {
-            projectNextItem: {
-              id: 'project-next-item-id'
+          addProjectV2ItemById: {
+            item: {
+              id: 'project-item-id'
             }
           }
         }
@@ -49,7 +50,7 @@ describe('addToProject', () => {
 
     await addToProject()
 
-    expect(outputs.itemId).toEqual('project-next-item-id')
+    expect(outputs.itemId).toEqual('project-item-id')
   })
 
   test('adds matching issues with a label filter without label-operator', async () => {
@@ -71,18 +72,18 @@ describe('addToProject', () => {
         test: /getProject/,
         return: {
           organization: {
-            projectNext: {
-              id: 'project-next-id'
+            projectV2: {
+              id: 'project-id'
             }
           }
         }
       },
       {
-        test: /addProjectNextItem/,
+        test: /addProjectV2ItemById/,
         return: {
-          addProjectNextItem: {
-            projectNextItem: {
-              id: 'project-next-item-id'
+          addProjectV2ItemById: {
+            item: {
+              id: 'project-item-id'
             }
           }
         }
@@ -91,7 +92,7 @@ describe('addToProject', () => {
 
     await addToProject()
 
-    expect(outputs.itemId).toEqual('project-next-item-id')
+    expect(outputs.itemId).toEqual('project-item-id')
   })
 
   test('adds matching pull-requests with a label filter without label-operator', async () => {
@@ -114,18 +115,18 @@ describe('addToProject', () => {
         test: /getProject/,
         return: {
           organization: {
-            projectNext: {
-              id: 'project-next-id'
+            projectV2: {
+              id: 'project-id'
             }
           }
         }
       },
       {
-        test: /addProjectNextItem/,
+        test: /addProjectV2ItemById/,
         return: {
-          addProjectNextItem: {
-            projectNextItem: {
-              id: 'project-next-item-id'
+          addProjectV2ItemById: {
+            item: {
+              id: 'project-item-id'
             }
           }
         }
@@ -134,7 +135,7 @@ describe('addToProject', () => {
 
     await addToProject()
 
-    expect(outputs.itemId).toEqual('project-next-item-id')
+    expect(outputs.itemId).toEqual('project-item-id')
   })
 
   test('does not add un-matching issues with a label filter without label-operator', async () => {
@@ -178,18 +179,18 @@ describe('addToProject', () => {
         test: /getProject/,
         return: {
           organization: {
-            projectNext: {
-              id: 'project-next-id'
+            projectV2: {
+              id: 'project-id'
             }
           }
         }
       },
       {
-        test: /addProjectNextItem/,
+        test: /addProjectV2ItemById/,
         return: {
-          addProjectNextItem: {
-            projectNextItem: {
-              id: 'project-next-item-id'
+          addProjectV2ItemById: {
+            item: {
+              id: 'project-item-id'
             }
           }
         }
@@ -198,7 +199,7 @@ describe('addToProject', () => {
 
     await addToProject()
 
-    expect(outputs.itemId).toEqual('project-next-item-id')
+    expect(outputs.itemId).toEqual('project-item-id')
   })
 
   test('does not add un-matching issues with labels filter with AND label-operator', async () => {
@@ -307,18 +308,18 @@ describe('addToProject', () => {
         test: /getProject/,
         return: {
           organization: {
-            projectNext: {
-              id: 'project-next-id'
+            projectV2: {
+              id: 'project-id'
             }
           }
         }
       },
       {
-        test: /addProjectNextItem/,
+        test: /addProjectV2ItemById/,
         return: {
-          addProjectNextItem: {
-            projectNextItem: {
-              id: 'project-next-item-id'
+          addProjectV2ItemById: {
+            item: {
+              id: 'project-item-id'
             }
           }
         }
@@ -331,7 +332,7 @@ describe('addToProject', () => {
 
     expect(gqlMock).toHaveBeenCalled()
     expect(infoSpy).not.toHaveBeenCalled()
-    expect(outputs.itemId).toEqual('project-next-item-id')
+    expect(outputs.itemId).toEqual('project-item-id')
   })
 
   test('does not add un-matching issues with multiple label filters', async () => {
@@ -377,18 +378,18 @@ describe('addToProject', () => {
         test: /getProject/,
         return: {
           organization: {
-            projectNext: {
-              id: 'project-next-id'
+            projectV2: {
+              id: 'project-id'
             }
           }
         }
       },
       {
-        test: /addProjectNextItem/,
+        test: /addProjectV2ItemById/,
         return: {
-          addProjectNextItem: {
-            projectNextItem: {
-              id: 'project-next-item-id'
+          addProjectV2ItemById: {
+            item: {
+              id: 'project-item-id'
             }
           }
         }
@@ -401,7 +402,7 @@ describe('addToProject', () => {
 
     expect(gqlMock).toHaveBeenCalled()
     expect(infoSpy).not.toHaveBeenCalled()
-    expect(outputs.itemId).toEqual('project-next-item-id')
+    expect(outputs.itemId).toEqual('project-item-id')
   })
 
   test(`throws an error when url isn't a valid project url`, async () => {
@@ -467,18 +468,18 @@ describe('addToProject', () => {
         test: /getProject/,
         return: {
           organization: {
-            projectNext: {
-              id: 'project-next-id'
+            projectV2: {
+              id: 'project-id'
             }
           }
         }
       },
       {
-        test: /addProjectNextItem/,
+        test: /addProjectV2ItemById/,
         return: {
-          addProjectNextItem: {
-            projectNextItem: {
-              id: 'project-next-item-id'
+          addProjectV2ItemById: {
+            item: {
+              id: 'project-item-id'
             }
           }
         }
@@ -512,18 +513,18 @@ describe('addToProject', () => {
         test: /getProject/,
         return: {
           organization: {
-            projectNext: {
-              id: 'project-next-id'
+            projectV2: {
+              id: 'project-id'
             }
           }
         }
       },
       {
-        test: /addProjectNextItem/,
+        test: /addProjectV2ItemById/,
         return: {
-          addProjectNextItem: {
-            projectNextItem: {
-              id: 'project-next-item-id'
+          addProjectV2ItemById: {
+            item: {
+              id: 'project-item-id'
             }
           }
         }

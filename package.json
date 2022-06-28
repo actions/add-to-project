@@ -1,6 +1,6 @@
 {
   "name": "@actions/add-to-project",
-  "description": "Automatically issues and PRs to GitHub projects",
+  "description": "Automatically adds issues and PRs to GitHub projects",
   "version": "0.0.0",
   "author": "GitHub and contributors",
   "dependencies": {
