@@ -11,7 +11,7 @@ not the original GitHub projects.
 
 > **NOTE:** This Action (currently) only supports auto-adding Issues/Pull Requests to a Project which lives in the same organization as your target Repository.
 
-> **NOTE:** This action no longer uses the deprecated ProjectNext API. If you are looking for the old version of that action, use version [v0.0.3](https://github.com/actions/add-to-project/releases/tag/v0.0.3).
+> **NOTE:** ⚠️ This action no longer uses the deprecated ProjectNext API. If you are looking for the old version of that action, use version [v0.0.5](https://github.com/actions/add-to-project/releases/tag/v0.0.5).
 
 ## Usage
 
