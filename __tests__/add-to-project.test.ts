@@ -12,7 +12,7 @@ describe('addToProject', () => {
 
   beforeEach(() => {
     mockGetInput({
-      'project-url': 'https://github.com/orgs/github/projects/1',
+      'project-url': 'https://github.com/orgs/actions/projects/1',
       'github-token': 'gh_token'
     })
 
@@ -24,7 +24,22 @@ describe('addToProject', () => {
     jest.restoreAllMocks()
   })
 
-  test('adds an issue to the project', async () => {
+  test('adds an issue from the same organization to the project', async () => {
+    github.context.payload = {
+      issue: {
+        number: 1,
+        labels: [{name: 'bug'}],
+        // eslint-disable-next-line camelcase
+        html_url: 'https://github.com/actions/add-to-project/issues/74'
+      },
+      repository: {
+        name: 'add-to-project',
+        owner: {
+          login: 'actions'
+        }
+      }
+    }
+
     mockGraphQL(
       {
         test: /getProject/,
@@ -53,9 +68,53 @@ describe('addToProject', () => {
     expect(outputs.itemId).toEqual('project-item-id')
   })
 
+  test('adds an issue from a different organization to the project', async () => {
+    github.context.payload = {
+      issue: {
+        number: 2221,
+        labels: [{name: 'bug'}],
+        // eslint-disable-next-line camelcase
+        html_url: 'https://github.com/octokit/octokit.js/issues/2221'
+      },
+      repository: {
+        name: 'octokit.js',
+        owner: {
+          login: 'octokit'
+        }
+      }
+    }
+
+    mockGraphQL(
+      {
+        test: /getProject/,
+        return: {
+          organization: {
+            projectV2: {
+              id: 'project-id'
+            }
+          }
+        }
+      },
+      {
+        test: /addProjectV2DraftIssue/,
+        return: {
+          addProjectV2DraftIssue: {
+            projectItem: {
+              id: 'project-item-id'
+            }
+          }
+        }
+      }
+    )
+
+    await addToProject()
+
+    expect(outputs.itemId).toEqual('project-item-id')
+  })
+
   test('adds matching issues with a label filter without label-operator', async () => {
     mockGetInput({
-      'project-url': 'https://github.com/orgs/github/projects/1',
+      'project-url': 'https://github.com/orgs/actions/projects/1',
       'github-token': 'gh_token',
       labeled: 'bug, new'
     })
@@ -63,7 +122,15 @@ describe('addToProject', () => {
     github.context.payload = {
       issue: {
         number: 1,
-        labels: [{name: 'bug'}]
+        labels: [{name: 'bug'}],
+        // eslint-disable-next-line camelcase
+        html_url: 'https://github.com/actions/add-to-project/issues/74'
+      },
+      repository: {
+        name: 'add-to-project',
+        owner: {
+          login: 'actions'
+        }
       }
     }
 
@@ -97,7 +164,7 @@ describe('addToProject', () => {
 
   test('adds matching pull-requests with a label filter without label-operator', async () => {
     mockGetInput({
-      'project-url': 'https://github.com/orgs/github/projects/1',
+      'project-url': 'https://github.com/orgs/actions/projects/1',
       'github-token': 'gh_token',
       labeled: 'bug, new'
     })
@@ -106,7 +173,15 @@ describe('addToProject', () => {
       // eslint-disable-next-line camelcase
       pull_request: {
         number: 1,
-        labels: [{name: 'bug'}]
+        labels: [{name: 'bug'}],
+        // eslint-disable-next-line camelcase
+        html_url: 'https://github.com/actions/add-to-project/pull/136'
+      },
+      repository: {
+        name: 'add-to-project',
+        owner: {
+          login: 'actions'
+        }
       }
     }
 
@@ -140,7 +215,7 @@ describe('addToProject', () => {
 
   test('does not add un-matching issues with a label filter without label-operator', async () => {
     mockGetInput({
-      'project-url': 'https://github.com/orgs/github/projects/1',
+      'project-url': 'https://github.com/orgs/actions/projects/1',
       'github-token': 'gh_token',
       labeled: 'bug'
     })
@@ -148,7 +223,15 @@ describe('addToProject', () => {
     github.context.payload = {
       issue: {
         number: 1,
-        labels: []
+        labels: [],
+        // eslint-disable-next-line camelcase
+        html_url: 'https://github.com/actions/add-to-project/issues/74'
+      },
+      repository: {
+        name: 'add-to-project',
+        owner: {
+          login: 'actions'
+        }
       }
     }
 
@@ -161,7 +244,7 @@ describe('addToProject', () => {
 
   test('adds matching issues with labels filter with AND label-operator', async () => {
     mockGetInput({
-      'project-url': 'https://github.com/orgs/github/projects/1',
+      'project-url': 'https://github.com/orgs/actions/projects/1',
       'github-token': 'gh_token',
       labeled: 'bug, new',
       'label-operator': 'AND'
@@ -170,7 +253,15 @@ describe('addToProject', () => {
     github.context.payload = {
       issue: {
         number: 1,
-        labels: [{name: 'bug'}, {name: 'new'}]
+        labels: [{name: 'bug'}, {name: 'new'}],
+        // eslint-disable-next-line camelcase
+        html_url: 'https://github.com/actions/add-to-project/issues/74'
+      },
+      repository: {
+        name: 'add-to-project',
+        owner: {
+          login: 'actions'
+        }
       }
     }
 
@@ -204,7 +295,7 @@ describe('addToProject', () => {
 
   test('does not add un-matching issues with labels filter with AND label-operator', async () => {
     mockGetInput({
-      'project-url': 'https://github.com/orgs/github/projects/1',
+      'project-url': 'https://github.com/orgs/actions/projects/1',
       'github-token': 'gh_token',
       labeled: 'bug, new',
       'label-operator': 'AND'
@@ -213,7 +304,15 @@ describe('addToProject', () => {
     github.context.payload = {
       issue: {
         number: 1,
-        labels: [{name: 'bug'}, {name: 'other'}]
+        labels: [{name: 'bug'}, {name: 'other'}],
+        // eslint-disable-next-line camelcase
+        html_url: 'https://github.com/actions/add-to-project/issues/74'
+      },
+      repository: {
+        name: 'add-to-project',
+        owner: {
+          login: 'actions'
+        }
       }
     }
 
@@ -226,7 +325,7 @@ describe('addToProject', () => {
 
   test('does not add matching issues with labels filter with NOT label-operator', async () => {
     mockGetInput({
-      'project-url': 'https://github.com/orgs/github/projects/1',
+      'project-url': 'https://github.com/orgs/actions/projects/1',
       'github-token': 'gh_token',
       labeled: 'bug, new',
       'label-operator': 'NOT'
@@ -235,7 +334,15 @@ describe('addToProject', () => {
     github.context.payload = {
       issue: {
         number: 1,
-        labels: [{name: 'bug'}]
+        labels: [{name: 'bug'}],
+        // eslint-disable-next-line camelcase
+        html_url: 'https://github.com/actions/add-to-project/issues/74'
+      },
+      repository: {
+        name: 'add-to-project',
+        owner: {
+          login: 'actions'
+        }
       }
     }
 
@@ -248,7 +355,7 @@ describe('addToProject', () => {
 
   test('adds issues that do not have labels present in the label list with NOT label-operator', async () => {
     mockGetInput({
-      'project-url': 'https://github.com/orgs/github/projects/1',
+      'project-url': 'https://github.com/orgs/actions/projects/1',
       'github-token': 'gh_token',
       labeled: 'bug, new',
       'label-operator': 'NOT'
@@ -257,7 +364,15 @@ describe('addToProject', () => {
     github.context.payload = {
       issue: {
         number: 1,
-        labels: [{name: 'other'}]
+        labels: [{name: 'other'}],
+        // eslint-disable-next-line camelcase
+        html_url: 'https://github.com/actions/add-to-project/issues/74'
+      },
+      repository: {
+        name: 'add-to-project',
+        owner: {
+          login: 'actions'
+        }
       }
     }
 
@@ -291,7 +406,7 @@ describe('addToProject', () => {
 
   test('adds matching issues with multiple label filters', async () => {
     mockGetInput({
-      'project-url': 'https://github.com/orgs/github/projects/1',
+      'project-url': 'https://github.com/orgs/actions/projects/1',
       'github-token': 'gh_token',
       labeled: 'accessibility,backend,bug'
     })
@@ -299,7 +414,15 @@ describe('addToProject', () => {
     github.context.payload = {
       issue: {
         number: 1,
-        labels: [{name: 'accessibility'}, {name: 'backend'}]
+        labels: [{name: 'accessibility'}, {name: 'backend'}],
+        // eslint-disable-next-line camelcase
+        html_url: 'https://github.com/actions/add-to-project/issues/74'
+      },
+      repository: {
+        name: 'add-to-project',
+        owner: {
+          login: 'actions'
+        }
       }
     }
 
@@ -337,7 +460,7 @@ describe('addToProject', () => {
 
   test('does not add un-matching issues with multiple label filters', async () => {
     mockGetInput({
-      'project-url': 'https://github.com/orgs/github/projects/1',
+      'project-url': 'https://github.com/orgs/actions/projects/1',
       'github-token': 'gh_token',
       labeled: 'accessibility, backend, bug'
     })
@@ -345,7 +468,15 @@ describe('addToProject', () => {
     github.context.payload = {
       issue: {
         number: 1,
-        labels: [{name: 'data'}, {name: 'frontend'}, {name: 'improvement'}]
+        labels: [{name: 'data'}, {name: 'frontend'}, {name: 'improvement'}],
+        // eslint-disable-next-line camelcase
+        html_url: 'https://github.com/actions/add-to-project/issues/74'
+      },
+      repository: {
+        name: 'add-to-project',
+        owner: {
+          login: 'actions'
+        }
       }
     }
 
@@ -360,7 +491,7 @@ describe('addToProject', () => {
 
   test('handles spaces and extra commas gracefully in label filter input', async () => {
     mockGetInput({
-      'project-url': 'https://github.com/orgs/github/projects/1',
+      'project-url': 'https://github.com/orgs/actions/projects/1',
       'github-token': 'gh_token',
       labeled: 'accessibility  ,   backend    ,,  . ,     bug'
     })
@@ -369,7 +500,15 @@ describe('addToProject', () => {
       issue: {
         number: 1,
         labels: [{name: 'accessibility'}, {name: 'backend'}, {name: 'bug'}],
-        'label-operator': 'AND'
+        'label-operator': 'AND',
+        // eslint-disable-next-line camelcase
+        html_url: 'https://github.com/actions/add-to-project/issues/74'
+      },
+      repository: {
+        name: 'add-to-project',
+        owner: {
+          login: 'actions'
+        }
       }
     }
 
@@ -414,7 +553,15 @@ describe('addToProject', () => {
     github.context.payload = {
       issue: {
         number: 1,
-        labels: []
+        labels: [],
+        // eslint-disable-next-line camelcase
+        html_url: 'https://github.com/actions/add-to-project/issues/74'
+      },
+      repository: {
+        name: 'add-to-project',
+        owner: {
+          login: 'actions'
+        }
       }
     }
 
@@ -436,7 +583,15 @@ describe('addToProject', () => {
     github.context.payload = {
       issue: {
         number: 1,
-        labels: []
+        labels: [],
+        // eslint-disable-next-line camelcase
+        html_url: 'https://github.com/actions/add-to-project/issues/74'
+      },
+      repository: {
+        name: 'add-to-project',
+        owner: {
+          login: 'actions'
+        }
       }
     }
 
@@ -451,7 +606,7 @@ describe('addToProject', () => {
 
   test('constructs the correct graphQL query given an organization owner', async () => {
     mockGetInput({
-      'project-url': 'https://github.com/orgs/github/projects/1',
+      'project-url': 'https://github.com/orgs/actions/projects/1',
       'github-token': 'gh_token',
       labeled: 'bug, new'
     })
@@ -459,7 +614,15 @@ describe('addToProject', () => {
     github.context.payload = {
       issue: {
         number: 1,
-        labels: [{name: 'bug'}]
+        labels: [{name: 'bug'}],
+        // eslint-disable-next-line camelcase
+        html_url: 'https://github.com/actions/add-to-project/issues/74'
+      },
+      repository: {
+        name: 'add-to-project',
+        owner: {
+          login: 'actions'
+        }
       }
     }
 
@@ -488,8 +651,8 @@ describe('addToProject', () => {
 
     await addToProject()
 
-    expect(gqlMock).toHaveBeenNthCalledWith(1, expect.stringContaining('organization(login: $ownerName)'), {
-      ownerName: 'github',
+    expect(gqlMock).toHaveBeenNthCalledWith(1, expect.stringContaining('organization(login: $projectOwnerName)'), {
+      projectOwnerName: 'actions',
       projectNumber: 1
     })
   })
@@ -504,7 +667,15 @@ describe('addToProject', () => {
     github.context.payload = {
       issue: {
         number: 1,
-        labels: [{name: 'bug'}]
+        labels: [{name: 'bug'}],
+        // eslint-disable-next-line camelcase
+        html_url: 'https://github.com/monalisa/add-to-project/issues/74'
+      },
+      repository: {
+        name: 'add-to-project',
+        owner: {
+          login: 'monalisa'
+        }
       }
     }
 
@@ -533,15 +704,15 @@ describe('addToProject', () => {
 
     await addToProject()
 
-    expect(gqlMock).toHaveBeenNthCalledWith(1, expect.stringContaining('user(login: $ownerName)'), {
-      ownerName: 'monalisa',
+    expect(gqlMock).toHaveBeenNthCalledWith(1, expect.stringContaining('user(login: $projectOwnerName)'), {
+      projectOwnerName: 'monalisa',
       projectNumber: 1
     })
   })
 
   test('compares labels case-insensitively', async () => {
     mockGetInput({
-      'project-url': 'https://github.com/orgs/github/projects/1',
+      'project-url': 'https://github.com/orgs/actions/projects/1',
       'github-token': 'gh_token',
       labeled: 'FOO, Bar, baz',
       'label-operator': 'AND'
@@ -550,7 +721,15 @@ describe('addToProject', () => {
     github.context.payload = {
       issue: {
         number: 1,
-        labels: [{name: 'foo'}, {name: 'BAR'}, {name: 'baz'}]
+        labels: [{name: 'foo'}, {name: 'BAR'}, {name: 'baz'}],
+        // eslint-disable-next-line camelcase
+        html_url: 'https://github.com/actions/add-to-project/issues/74'
+      },
+      repository: {
+        name: 'add-to-project',
+        owner: {
+          login: 'actions'
+        }
       }
     }
 
