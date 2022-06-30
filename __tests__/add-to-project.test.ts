@@ -266,17 +266,17 @@ describe('addToProject', () => {
         test: /getProject/,
         return: {
           organization: {
-            projectNext: {
+            projectV2: {
               id: 'project-next-id'
             }
           }
         }
       },
       {
-        test: /addProjectNextItem/,
+        test: /addProjectV2ItemById/,
         return: {
-          addProjectNextItem: {
-            projectNextItem: {
+          addProjectV2ItemById: {
+            item: {
               id: 'project-next-item-id'
             }
           }
@@ -559,17 +559,17 @@ describe('addToProject', () => {
         test: /getProject/,
         return: {
           organization: {
-            projectNext: {
+            projectV2: {
               id: 'project-next-id'
             }
           }
         }
       },
       {
-        test: /addProjectNextItem/,
+        test: /addProjectV2ItemById/,
         return: {
-          addProjectNextItem: {
-            projectNextItem: {
+          addProjectV2ItemById: {
+            item: {
               id: 'project-next-item-id'
             }
           }
