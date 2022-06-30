@@ -454,7 +454,9 @@ describe('addToProject', () => {
     await addToProject()
 
     expect(gqlMock).toHaveBeenCalled()
-    expect(infoSpy).not.toHaveBeenCalled()
+    expect(infoSpy).toHaveBeenCalledWith('Creating project item')
+    // We shouldn't have any logs relating to the issue being skipped
+    expect(infoSpy.mock.calls.length).toEqual(1)
     expect(outputs.itemId).toEqual('project-item-id')
   })
 
@@ -540,7 +542,9 @@ describe('addToProject', () => {
     await addToProject()
 
     expect(gqlMock).toHaveBeenCalled()
-    expect(infoSpy).not.toHaveBeenCalled()
+    expect(infoSpy).toHaveBeenCalledWith('Creating project item')
+    // We shouldn't have any logs relating to the issue being skipped
+    expect(infoSpy.mock.calls.length).toEqual(1)
     expect(outputs.itemId).toEqual('project-item-id')
   })
 
