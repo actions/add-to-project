@@ -15,7 +15,7 @@
     "@github/prettier-config": "^0.0.4",
     "@types/jest": "^27.5.0",
     "@types/node": "~16.11.42",
-    "@typescript-eslint/parser": "^5.30.0",
+    "@typescript-eslint/parser": "^5.30.4",
     "@vercel/ncc": "^0.34.0",
     "concurrently": "^7.2.2",
     "eslint": "^8.18.0",
