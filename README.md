@@ -1,9 +1,7 @@
 # actions/add-to-project
 
-Use this action to automatically add the current issue or pull request to a GitHub project.
-Note that this is for [GitHub projects
-(beta)](https://docs.github.com/en/issues/trying-out-the-new-projects-experience/about-projects),
-not the original GitHub projects.
+Use this action to automatically add the current issue or pull request to a [GitHub project](https://docs.github.com/en/issues/trying-out-the-new-projects-experience/about-projects).
+Note that this action does not support [GitHub projects (classic)](https://docs.github.com/en/issues/organizing-your-work-with-project-boards).
 
 ## Current Status
 
