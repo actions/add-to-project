@@ -7,8 +7,6 @@ Note that this action does not support [GitHub projects (classic)](https://docs.
 
 [![build-test](https://github.com/actions/add-to-project/actions/workflows/test.yml/badge.svg)](https://github.com/actions/add-to-project/actions/workflows/test.yml)
 
-> **NOTE:** This Action (currently) only supports auto-adding Issues/Pull Requests to a Project which lives in the same organization as your target Repository.
-
 > **NOTE:** ⚠️ This action no longer uses the deprecated ProjectNext API. If you are looking for the old version of that action, use version [v0.0.5](https://github.com/actions/add-to-project/releases/tag/v0.0.5).
 
 ## Usage
@@ -40,6 +38,8 @@ jobs:
     steps:
       - uses: actions/add-to-project@RELEASE_VERSION
         with:
+          # You can target a repository in a different organization
+          # to the issue
           project-url: https://github.com/orgs/<orgName>/projects/<projectNumber>
           github-token: ${{ secrets.ADD_TO_PROJECT_PAT }}
           labeled: bug, needs-triage
