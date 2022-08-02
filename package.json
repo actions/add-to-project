@@ -14,8 +14,13 @@
   "devDependencies": {
     "@github/prettier-config": "^0.0.4",
     "@types/jest": "^27.5.0",
+<<<<<<< HEAD
     "@types/node": "~16.11.47",
     "@typescript-eslint/parser": "^5.31.0",
+=======
+    "@types/node": "~16.11.45",
+    "@typescript-eslint/parser": "^5.30.7",
+>>>>>>> parent of 138feaf (Merge pull request #162 from actions/dependabot/npm_and_yarn/typescript-eslint/parser-5.31.0)
     "@vercel/ncc": "^0.34.0",
     "concurrently": "^7.3.0",
     "eslint": "^8.21.0",
