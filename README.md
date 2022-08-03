@@ -1,15 +1,11 @@
 # actions/add-to-project
 
-Use this action to automatically add the current issue or pull request to a GitHub project.
-Note that this is for [GitHub projects
-(beta)](https://docs.github.com/en/issues/trying-out-the-new-projects-experience/about-projects),
-not the original GitHub projects.
+Use this action to automatically add the current issue or pull request to a [GitHub project](https://docs.github.com/en/issues/trying-out-the-new-projects-experience/about-projects).
+Note that this action does not support [GitHub projects (classic)](https://docs.github.com/en/issues/organizing-your-work-with-project-boards).
 
 ## Current Status
 
 [![build-test](https://github.com/actions/add-to-project/actions/workflows/test.yml/badge.svg)](https://github.com/actions/add-to-project/actions/workflows/test.yml)
-
-> **NOTE:** This Action (currently) only supports auto-adding Issues/Pull Requests to a Project which lives in the same organization as your target Repository.
 
 > **NOTE:** ⚠️ This action no longer uses the deprecated ProjectNext API. If you are looking for the old version of that action, use version [v0.0.5](https://github.com/actions/add-to-project/releases/tag/v0.0.5).
 
@@ -42,6 +38,8 @@ jobs:
     steps:
       - uses: actions/add-to-project@RELEASE_VERSION
         with:
+          # You can target a repository in a different organization
+          # to the issue
           project-url: https://github.com/orgs/<orgName>/projects/<projectNumber>
           github-token: ${{ secrets.ADD_TO_PROJECT_PAT }}
           labeled: bug, needs-triage

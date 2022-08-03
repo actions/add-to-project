@@ -28,6 +28,14 @@ interface ProjectAddItemResponse {
   }
 }
 
+interface ProjectV2AddDraftIssueResponse {
+  addProjectV2DraftIssue: {
+    projectItem: {
+      id: string
+    }
+  }
+}
+
 export async function addToProject(): Promise<void> {
   const projectUrl = core.getInput('project-url', {required: true})
   const ghToken = core.getInput('github-token', {required: true})
@@ -41,9 +49,11 @@ export async function addToProject(): Promise<void> {
 
   const octokit = github.getOctokit(ghToken)
 
-  const urlMatch = projectUrl.match(urlParse)
   const issue = github.context.payload.issue ?? github.context.payload.pull_request
   const issueLabels: string[] = (issue?.labels ?? []).map((l: {name: string}) => l.name.toLowerCase())
+  const issueOwnerName = github.context.payload.repository?.owner.login
+
+  core.debug(`Issue/PR owner: ${issueOwnerName}`)
 
   // Ensure the issue matches our `labeled` filter based on the label-operator.
   if (labelOperator === 'and') {
@@ -65,32 +75,34 @@ export async function addToProject(): Promise<void> {
 
   core.debug(`Project URL: ${projectUrl}`)
 
+  const urlMatch = projectUrl.match(urlParse)
+
   if (!urlMatch) {
     throw new Error(
       `Invalid project URL: ${projectUrl}. Project URL should match the format https://github.com/<orgs-or-users>/<ownerName>/projects/<projectNumber>`
     )
   }
 
-  const ownerName = urlMatch.groups?.ownerName
+  const projectOwnerName = urlMatch.groups?.ownerName
   const projectNumber = parseInt(urlMatch.groups?.projectNumber ?? '', 10)
   const ownerType = urlMatch.groups?.ownerType
   const ownerTypeQuery = mustGetOwnerTypeQuery(ownerType)
 
-  core.debug(`Org name: ${ownerName}`)
+  core.debug(`Project owner: ${projectOwnerName}`)
   core.debug(`Project number: ${projectNumber}`)
-  core.debug(`Owner type: ${ownerType}`)
+  core.debug(`Project owner type: ${ownerType}`)
 
   // First, use the GraphQL API to request the project's node ID.
   const idResp = await octokit.graphql<ProjectNodeIDResponse>(
-    `query getProject($ownerName: String!, $projectNumber: Int!) {
-      ${ownerTypeQuery}(login: $ownerName) {
+    `query getProject($projectOwnerName: String!, $projectNumber: Int!) {
+      ${ownerTypeQuery}(login: $projectOwnerName) {
         projectV2(number: $projectNumber) {
           id
         }
       }
     }`,
     {
-      ownerName,
+      projectOwnerName,
       projectNumber
     }
   )
@@ -102,23 +114,50 @@ export async function addToProject(): Promise<void> {
   core.debug(`Content ID: ${contentId}`)
 
   // Next, use the GraphQL API to add the issue to the project.
-  const addResp = await octokit.graphql<ProjectAddItemResponse>(
-    `mutation addIssueToProject($input: AddProjectV2ItemByIdInput!) {
-      addProjectV2ItemById(input: $input) {
-        item {
-          id
+  // If the issue has the same owner as the project, we can directly
+  // add a project item. Otherwise, we add a draft issue.
+  if (issueOwnerName === projectOwnerName) {
+    core.info('Creating project item')
+
+    const addResp = await octokit.graphql<ProjectAddItemResponse>(
+      `mutation addIssueToProject($input: AddProjectV2ItemByIdInput!) {
+        addProjectV2ItemById(input: $input) {
+          item {
+            id
+          }
+        }
+      }`,
+      {
+        input: {
+          projectId,
+          contentId
         }
       }
-    }`,
-    {
-      input: {
-        projectId,
-        contentId
-      }
-    }
-  )
+    )
 
-  core.setOutput('itemId', addResp.addProjectV2ItemById.item.id)
+    core.setOutput('itemId', addResp.addProjectV2ItemById.item.id)
+  } else {
+    core.info('Creating draft issue in project')
+
+    const addResp = await octokit.graphql<ProjectV2AddDraftIssueResponse>(
+      `mutation addDraftIssueToProject($projectId: ID!, $title: String!) {
+        addProjectV2DraftIssue(input: {
+          projectId: $projectId,
+          title: $title
+        }) {
+          projectItem {
+            id
+          }
+        }
+      }`,
+      {
+        projectId,
+        title: issue?.html_url
+      }
+    )
+
+    core.setOutput('itemId', addResp.addProjectV2DraftIssue.projectItem.id)
+  }
 }
 
 export function mustGetOwnerTypeQuery(ownerType?: string): 'organization' | 'user' {
