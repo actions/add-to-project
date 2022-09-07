@@ -17,7 +17,7 @@
     "@types/node": "~16.11.56",
     "@typescript-eslint/parser": "^5.36.1",
     "@vercel/ncc": "^0.34.0",
-    "concurrently": "^7.3.0",
+    "concurrently": "^7.4.0",
     "eslint": "^8.23.0",
     "eslint-plugin-github": "^4.3.7",
     "eslint-plugin-jest": "^27.0.1",
