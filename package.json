@@ -19,7 +19,7 @@
     "@vercel/ncc": "^0.34.0",
     "concurrently": "^7.4.0",
     "eslint": "^8.24.0",
-    "eslint-plugin-github": "^4.3.7",
+    "eslint-plugin-github": "^4.4.0",
     "eslint-plugin-jest": "^27.1.1",
     "eslint-plugin-prettier": "^4.2.1",
     "jest": "^27.5.1",
