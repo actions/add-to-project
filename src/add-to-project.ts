@@ -49,6 +49,7 @@ export async function addToProject(): Promise<void> {
 
   const octokit = github.getOctokit(ghToken)
   async function getIssueById(id: number) {
+    core.debug(`Retrieving issue: ${id}`)
     return octokit.rest.issues.get({
       owner: github.context.repo.owner,
       repo: github.context.repo.repo,
@@ -63,6 +64,7 @@ export async function addToProject(): Promise<void> {
   const issueLabels: string[] = (issue?.labels ?? []).map((l: {name: string}) => l.name.toLowerCase())
   const issueOwnerName = github.context.payload.repository?.owner.login
 
+  core.debug(`Issue: ${issue}`)
   core.debug(`Issue/PR owner: ${issueOwnerName}`)
 
   // Ensure the issue matches our `labeled` filter based on the label-operator.
