@@ -48,8 +48,18 @@ export async function addToProject(): Promise<void> {
   const labelOperator = core.getInput('label-operator').trim().toLocaleLowerCase()
 
   const octokit = github.getOctokit(ghToken)
+  async function getIssueById(id: number) {
+    return octokit.rest.issues.get({
+      owner: github.context.repo.owner,
+      repo: github.context.repo.repo,
+      issue_number: id
+    })
+  }
 
-  const issue = github.context.payload.issue ?? github.context.payload.pull_request
+  const issueId = core.getInput('issue-id')
+  const issue = issueId
+    ? await getIssueById(Number(issueId))
+    : github.context.payload.issue ?? github.context.payload.pull_request
   const issueLabels: string[] = (issue?.labels ?? []).map((l: {name: string}) => l.name.toLowerCase())
   const issueOwnerName = github.context.payload.repository?.owner.login
 

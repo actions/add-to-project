@@ -16,6 +16,9 @@ inputs:
   label-operator:
     required: false
     description: The behavior of the labels filter, AND to match all labels, OR to match any label, NOT to exclude any listed label (default is OR)
+  issue-id:
+    required: false
+    description: The id of the issue to use instead of context (e.g. if using workflow_dispatch)
 runs:
   using: 'node16'
   main: 'dist/index.js'
