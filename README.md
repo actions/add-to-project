@@ -142,8 +142,9 @@ Using these events ensure that a given issue or pull request, in the workflow's 
 
 - add the newly created PAT as a repository secret, this secret will be referenced by the [github-token input](#github-token)
   _See [Encrypted secrets](https://docs.github.com/en/actions/security-guides/encrypted-secrets#creating-encrypted-secrets-for-a-repository) for more information_
-  
+
 ## Setting a specific status or column name to the project item
+
 If you want to add an issue to a custom default column in a project (i.e. other than 'Todo'), you can do this directly via the project UI. You don't need to add anything else to your YAML workflow file to get this to work.
 
 Use the [Add To GitHub Projects](https://github.com/marketplace/actions/add-to-github-projects) action to assign newly opened issues to the project. And then in the project UI simply [specify which column to use as the default](https://docs.github.com/en/issues/planning-and-tracking-with-projects/learning-about-projects/quickstart-for-projects#configure-built-in-automation)!

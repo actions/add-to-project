@@ -101,7 +101,7 @@ function addToProject() {
       }
     }`, {
             projectOwnerName,
-            projectNumber
+            projectNumber,
         });
         const projectId = (_j = idResp[ownerTypeQuery]) === null || _j === void 0 ? void 0 : _j.projectV2.id;
         const contentId = issue === null || issue === void 0 ? void 0 : issue.node_id;
@@ -121,8 +121,8 @@ function addToProject() {
       }`, {
                 input: {
                     projectId,
-                    contentId
-                }
+                    contentId,
+                },
             });
             core.setOutput('itemId', addResp.addProjectV2ItemById.item.id);
         }
@@ -139,7 +139,7 @@ function addToProject() {
         }
       }`, {
                 projectId,
-                title: issue === null || issue === void 0 ? void 0 : issue.html_url
+                title: issue === null || issue === void 0 ? void 0 : issue.html_url,
             });
             core.setOutput('itemId', addResp.addProjectV2DraftIssue.projectItem.id);
         }

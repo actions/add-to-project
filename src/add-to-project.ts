@@ -79,7 +79,7 @@ export async function addToProject(): Promise<void> {
 
   if (!urlMatch) {
     throw new Error(
-      `Invalid project URL: ${projectUrl}. Project URL should match the format https://github.com/<orgs-or-users>/<ownerName>/projects/<projectNumber>`
+      `Invalid project URL: ${projectUrl}. Project URL should match the format https://github.com/<orgs-or-users>/<ownerName>/projects/<projectNumber>`,
     )
   }
 
@@ -103,8 +103,8 @@ export async function addToProject(): Promise<void> {
     }`,
     {
       projectOwnerName,
-      projectNumber
-    }
+      projectNumber,
+    },
   )
 
   const projectId = idResp[ownerTypeQuery]?.projectV2.id
@@ -130,9 +130,9 @@ export async function addToProject(): Promise<void> {
       {
         input: {
           projectId,
-          contentId
-        }
-      }
+          contentId,
+        },
+      },
     )
 
     core.setOutput('itemId', addResp.addProjectV2ItemById.item.id)
@@ -152,8 +152,8 @@ export async function addToProject(): Promise<void> {
       }`,
       {
         projectId,
-        title: issue?.html_url
-      }
+        title: issue?.html_url,
+      },
     )
 
     core.setOutput('itemId', addResp.addProjectV2DraftIssue.projectItem.id)
