@@ -54,6 +54,7 @@ export async function addToProject(): Promise<void> {
   const issueOwnerName = github.context.payload.repository?.owner.login
 
   core.debug(`Issue/PR owner: ${issueOwnerName}`)
+  core.debug(`Issue/PR labels: ${issueLabels.join(', ')}`)
 
   // Ensure the issue matches our `labeled` filter based on the label-operator.
   if (labelOperator === 'and') {

@@ -61,6 +61,7 @@ function addToProject() {
         const issueLabels = ((_c = issue === null || issue === void 0 ? void 0 : issue.labels) !== null && _c !== void 0 ? _c : []).map((l) => l.name.toLowerCase());
         const issueOwnerName = (_d = github.context.payload.repository) === null || _d === void 0 ? void 0 : _d.owner.login;
         core.debug(`Issue/PR owner: ${issueOwnerName}`);
+        core.debug(`Issue/PR labels: ${issueLabels.join(', ')}`);
         // Ensure the issue matches our `labeled` filter based on the label-operator.
         if (labelOperator === 'and') {
             if (!labeled.every(l => issueLabels.includes(l))) {
