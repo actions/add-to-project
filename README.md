@@ -38,7 +38,7 @@ jobs:
     steps:
       - uses: actions/add-to-project@RELEASE_VERSION
         with:
-          # You can target a repository in a different organization
+          # You can target a project in a different organization
           # to the issue
           project-url: https://github.com/orgs/<orgName>/projects/<projectNumber>
           github-token: ${{ secrets.ADD_TO_PROJECT_PAT }}
