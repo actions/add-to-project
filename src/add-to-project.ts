@@ -4,7 +4,7 @@ import * as github from '@actions/github'
 // TODO: Ensure this (and the Octokit client) works for non-github.com URLs, as well.
 // https://github.com/orgs|users/<ownerName>/projects/<projectNumber>
 const urlParse =
-  /^(?:https:\/\/)?github\.com\/(?<ownerType>orgs|users)\/(?<ownerName>[^/]+)\/projects\/(?<projectNumber>\d+)/
+  /\/(?<ownerType>orgs|users)\/(?<ownerName>[^/]+)\/projects\/(?<projectNumber>\d+)/
 
 interface ProjectNodeIDResponse {
   organization?: {
@@ -80,7 +80,7 @@ export async function addToProject(): Promise<void> {
 
   if (!urlMatch) {
     throw new Error(
-      `Invalid project URL: ${projectUrl}. Project URL should match the format https://github.com/<orgs-or-users>/<ownerName>/projects/<projectNumber>`,
+      `Invalid project URL: ${projectUrl}. Project URL should match the format <Github server FQDN>/<orgs-or-users>/<ownerName>/projects/<projectNumber>`,
     )
   }
 
