@@ -120,6 +120,36 @@ jobs:
 - <a name="label-operator">`label-operator`</a> **(optional)** is the behavior of the labels filter, either `AND`, `OR` or `NOT` that controls if the issue should be matched with `all` `labeled` input or any of them, default is `OR`.
 - <a name="payload">`payload`</a> **(optional)** replace the default github.context.payload with a different context (usually ${{ github }} from a different workflow, passed in as the client payload via Repository Dispatch)
 
+### Usage example with Repository Dispatch and `payload`
+
+Source workflow step:
+
+```
+- uses: peter-evans/repository-dispatch@v2
+  with:
+    token: ${{ secrets.GITHUB_TOKEN }}
+    repository: github/enterprise-advocates
+    event-type: update-project-event
+    client-payload: '{
+          "github":{
+              "repository":{
+                "owner":{
+                    "login": ${{ toJson(github.repository_owner) }}
+                }
+              },
+              "issue": ${{ toJson(github.event.issue) }}
+          }
+        }'
+```
+
+Target workflow step:
+
+```
+- uses: actions/add-to-project@RELEASE_VERSION
+  with:
+    payload: ${{ toJson(github.event.client_payload.github) }}
+```
+
 ## Supported Events
 
 Currently this action supports the following [`issues` events](https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#issues):

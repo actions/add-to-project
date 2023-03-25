@@ -52,7 +52,7 @@ export async function addToProject(): Promise<void> {
 
   const issue = payload.issue ?? payload.pull_request
   const issueLabels: string[] = (issue?.labels ?? []).map((l: {name: string}) => l.name.toLowerCase())
-  const issueOwnerName = payload.repository_owner || payload.repository?.owner.login
+  const issueOwnerName = payload.repository?.owner.login
 
   core.debug(`Issue/PR owner: ${issueOwnerName}`)
   core.debug(`Issue/PR labels: ${issueLabels.join(', ')}`)

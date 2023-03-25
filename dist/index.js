@@ -60,7 +60,7 @@ function addToProject() {
         const octokit = github.getOctokit(ghToken);
         const issue = (_b = payload.issue) !== null && _b !== void 0 ? _b : payload.pull_request;
         const issueLabels = ((_c = issue === null || issue === void 0 ? void 0 : issue.labels) !== null && _c !== void 0 ? _c : []).map((l) => l.name.toLowerCase());
-        const issueOwnerName = payload.repository_owner || ((_d = payload.repository) === null || _d === void 0 ? void 0 : _d.owner.login);
+        const issueOwnerName = (_d = payload.repository) === null || _d === void 0 ? void 0 : _d.owner.login;
         core.debug(`Issue/PR owner: ${issueOwnerName}`);
         core.debug(`Issue/PR labels: ${issueLabels.join(', ')}`);
         // Ensure the issue matches our `labeled` filter based on the label-operator.
