@@ -128,8 +128,8 @@ Source workflow step:
 - uses: peter-evans/repository-dispatch@v2
   with:
     token: ${{ secrets.GITHUB_TOKEN }}
-    repository: github/enterprise-advocates
-    event-type: update-project-event
+    repository: <orgName>/<reponame>
+    event-type: UNIQUE-EVENT-NAME
     client-payload: '{
           "github":{
               "repository":{
@@ -140,6 +140,13 @@ Source workflow step:
               "issue": ${{ toJson(github.event.issue) }}
           }
         }'
+```
+
+Target workflow trigger:
+```
+on:
+  repository_dispatch:
+    types: [UNIQUE-EVENT-NAME]
 ```
 
 Target workflow step:
