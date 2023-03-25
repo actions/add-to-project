@@ -37,7 +37,7 @@ interface ProjectV2AddDraftIssueResponse {
 }
 
 export async function addToProject(): Promise<void> {
-  const payload = core.getInput('payload')?JSON.parse(core.getInput('payload')):github.context.payload
+  const payload = core.getInput('payload') ? JSON.parse(core.getInput('payload')) : github.context.payload
   const projectUrl = core.getInput('project-url', {required: true})
   const ghToken = core.getInput('github-token', {required: true})
   const labeled =
