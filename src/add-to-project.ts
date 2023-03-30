@@ -78,7 +78,7 @@ export async function addToProject(): Promise<void> {
 
   if (!urlMatch) {
     throw new Error(
-      `Invalid project URL: ${projectUrl}. Project URL should match the format <Github server domain name>/<orgs-or-users>/<ownerName>/projects/<projectNumber>`,
+      `Invalid project URL: ${projectUrl}. Project URL should match the format <GitHub server domain name>/<orgs-or-users>/<ownerName>/projects/<projectNumber>`,
     )
   }
 
