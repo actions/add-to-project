@@ -572,7 +572,7 @@ describe('addToProject', () => {
     const infoSpy = jest.spyOn(core, 'info')
     const gqlMock = mockGraphQL()
     await expect(addToProject()).rejects.toThrow(
-      'https://github.com/orgs/github/repositories. Project URL should match the format https://github.com/<orgs-or-users>/<ownerName>/projects/<projectNumber>',
+      'Invalid project URL: https://github.com/orgs/github/repositories. Project URL should match the format <Github server domain name>/<orgs-or-users>/<ownerName>/projects/<projectNumber>',
     )
     expect(infoSpy).not.toHaveBeenCalled()
     expect(gqlMock).not.toHaveBeenCalled()
