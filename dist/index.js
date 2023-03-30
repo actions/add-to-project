@@ -48,6 +48,7 @@ const urlParse = /^(?:https:\/\/)?github\.com\/(?<ownerType>orgs|users)\/(?<owne
 function addToProject() {
     var _a, _b, _c, _d, _e, _f, _g, _h, _j;
     return __awaiter(this, void 0, void 0, function* () {
+        const payload = core.getInput('payload') ? JSON.parse(core.getInput('payload')) : github.context.payload;
         const projectUrl = core.getInput('project-url', { required: true });
         const ghToken = core.getInput('github-token', { required: true });
         const labeled = (_a = core
@@ -57,9 +58,9 @@ function addToProject() {
             .filter(l => l.length > 0)) !== null && _a !== void 0 ? _a : [];
         const labelOperator = core.getInput('label-operator').trim().toLocaleLowerCase();
         const octokit = github.getOctokit(ghToken);
-        const issue = (_b = github.context.payload.issue) !== null && _b !== void 0 ? _b : github.context.payload.pull_request;
+        const issue = (_b = payload.issue) !== null && _b !== void 0 ? _b : payload.pull_request;
         const issueLabels = ((_c = issue === null || issue === void 0 ? void 0 : issue.labels) !== null && _c !== void 0 ? _c : []).map((l) => l.name.toLowerCase());
-        const issueOwnerName = (_d = github.context.payload.repository) === null || _d === void 0 ? void 0 : _d.owner.login;
+        const issueOwnerName = (_d = payload.repository) === null || _d === void 0 ? void 0 : _d.owner.login;
         core.debug(`Issue/PR owner: ${issueOwnerName}`);
         core.debug(`Issue/PR labels: ${issueLabels.join(', ')}`);
         // Ensure the issue matches our `labeled` filter based on the label-operator.

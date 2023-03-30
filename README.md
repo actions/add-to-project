@@ -117,7 +117,45 @@ jobs:
   token](https://github.com/settings/tokens/new) with `repo` and `project` scopes.
   _See [Creating a PAT and adding it to your repository](#creating-a-pat-and-adding-it-to-your-repository) for more details_
 - <a name="labeled">`labeled`</a> **(optional)** is a comma-separated list of labels used to filter applicable issues. When this key is provided, an issue must have _one_ of the labels in the list to be added to the project. Omitting this key means that any issue will be added.
-- <a name="labeled">`label-operator`</a> **(optional)** is the behavior of the labels filter, either `AND`, `OR` or `NOT` that controls if the issue should be matched with `all` `labeled` input or any of them, default is `OR`.
+- <a name="label-operator">`label-operator`</a> **(optional)** is the behavior of the labels filter, either `AND`, `OR` or `NOT` that controls if the issue should be matched with `all` `labeled` input or any of them, default is `OR`.
+- <a name="payload">`payload`</a> **(optional)** replace the default github.context.payload with a different context (usually ${{ github }} from a different workflow, passed in as the client payload via Repository Dispatch)
+
+### Usage example with Repository Dispatch and `payload`
+
+Source workflow step:
+
+```
+- uses: peter-evans/repository-dispatch@v2
+  with:
+    token: ${{ secrets.GITHUB_TOKEN }}
+    repository: <orgName>/<reponame>
+    event-type: UNIQUE-EVENT-NAME
+    client-payload: '{
+          "github":{
+              "repository":{
+                "owner":{
+                    "login": ${{ toJson(github.repository_owner) }}
+                }
+              },
+              "issue": ${{ toJson(github.event.issue) }}
+          }
+        }'
+```
+
+Target workflow trigger:
+```
+on:
+  repository_dispatch:
+    types: [UNIQUE-EVENT-NAME]
+```
+
+Target workflow step:
+
+```
+- uses: actions/add-to-project@RELEASE_VERSION
+  with:
+    payload: ${{ toJson(github.event.client_payload.github) }}
+```
 
 ## Supported Events
 

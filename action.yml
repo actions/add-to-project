@@ -16,6 +16,9 @@ inputs:
   label-operator:
     required: false
     description: The behavior of the labels filter, AND to match all labels, OR to match any label, NOT to exclude any listed label (default is OR)
+  payload:
+    required: false
+    description: Replacement context to use instead of github.context.payload (usually {{ github }} from another workflow)
 runs:
   using: 'node16'
   main: 'dist/index.js'

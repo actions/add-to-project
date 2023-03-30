@@ -37,6 +37,7 @@ interface ProjectV2AddDraftIssueResponse {
 }
 
 export async function addToProject(): Promise<void> {
+  const payload = core.getInput('payload') ? JSON.parse(core.getInput('payload')) : github.context.payload
   const projectUrl = core.getInput('project-url', {required: true})
   const ghToken = core.getInput('github-token', {required: true})
   const labeled =
@@ -49,9 +50,9 @@ export async function addToProject(): Promise<void> {
 
   const octokit = github.getOctokit(ghToken)
 
-  const issue = github.context.payload.issue ?? github.context.payload.pull_request
+  const issue = payload.issue ?? payload.pull_request
   const issueLabels: string[] = (issue?.labels ?? []).map((l: {name: string}) => l.name.toLowerCase())
-  const issueOwnerName = github.context.payload.repository?.owner.login
+  const issueOwnerName = payload.repository?.owner.login
 
   core.debug(`Issue/PR owner: ${issueOwnerName}`)
   core.debug(`Issue/PR labels: ${issueLabels.join(', ')}`)
