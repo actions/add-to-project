@@ -578,18 +578,13 @@ describe('addToProject', () => {
     expect(gqlMock).not.toHaveBeenCalled()
   })
 
-  test(`throws an error when url isn't under the github.com domain`, async () => {
-    mockGetInput({
-      'project-url': 'https://notgithub.com/orgs/github/projects/1',
-      'github-token': 'gh_token',
-    })
-
+  test(`works with URLs that are not under the github.com domain`, async () => {
     github.context.payload = {
       issue: {
         number: 1,
-        labels: [],
+        labels: [{name: 'bug'}],
         // eslint-disable-next-line camelcase
-        html_url: 'https://github.com/actions/add-to-project/issues/74',
+        html_url: 'https://notgithub.com/actions/add-to-project/issues/74',
       },
       repository: {
         name: 'add-to-project',
@@ -599,13 +594,32 @@ describe('addToProject', () => {
       },
     }
 
-    const infoSpy = jest.spyOn(core, 'info')
-    const gqlMock = mockGraphQL()
-    await expect(addToProject()).rejects.toThrow(
-      'https://notgithub.com/orgs/github/projects/1. Project URL should match the format https://github.com/<orgs-or-users>/<ownerName>/projects/<projectNumber>',
+    mockGraphQL(
+      {
+        test: /getProject/,
+        return: {
+          organization: {
+            projectV2: {
+              id: 'project-id',
+            },
+          },
+        },
+      },
+      {
+        test: /addProjectV2ItemById/,
+        return: {
+          addProjectV2ItemById: {
+            item: {
+              id: 'project-item-id',
+            },
+          },
+        },
+      },
     )
-    expect(infoSpy).not.toHaveBeenCalled()
-    expect(gqlMock).not.toHaveBeenCalled()
+
+    await addToProject()
+
+    expect(outputs.itemId).toEqual('project-item-id')
   })
 
   test('constructs the correct graphQL query given an organization owner', async () => {
