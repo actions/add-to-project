@@ -20,3 +20,5 @@ jobs:
           npm run build
       - run: |
           npm run test
+sign:
+RaDzikalbonie
