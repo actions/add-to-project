@@ -42,7 +42,9 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.mustGetOwnerTypeQuery = exports.addToProject = void 0;
 const core = __importStar(__nccwpck_require__(2186));
 const github = __importStar(__nccwpck_require__(5438));
-const urlParse = /\/(?<ownerType>orgs|users)\/(?<ownerName>[^/]+)\/projects\/(?<projectNumber>\d+)/;
+// TODO: Ensure this (and the Octokit client) works for non-github.com URLs, as well.
+// https://github.com/orgs|users/<ownerName>/projects/<projectNumber>
+const urlParse = /^(?:https:\/\/)?github\.com\/(?<ownerType>orgs|users)\/(?<ownerName>[^/]+)\/projects\/(?<projectNumber>\d+)/;
 function addToProject() {
     var _a, _b, _c, _d, _e, _f, _g, _h, _j;
     return __awaiter(this, void 0, void 0, function* () {
@@ -82,7 +84,7 @@ function addToProject() {
         core.debug(`Project URL: ${projectUrl}`);
         const urlMatch = projectUrl.match(urlParse);
         if (!urlMatch) {
-            throw new Error(`Invalid project URL: ${projectUrl}. Project URL should match the format <GitHub server domain name>/<orgs-or-users>/<ownerName>/projects/<projectNumber>`);
+            throw new Error(`Invalid project URL: ${projectUrl}. Project URL should match the format https://github.com/<orgs-or-users>/<ownerName>/projects/<projectNumber>`);
         }
         const projectOwnerName = (_e = urlMatch.groups) === null || _e === void 0 ? void 0 : _e.ownerName;
         const projectNumber = parseInt((_g = (_f = urlMatch.groups) === null || _f === void 0 ? void 0 : _f.projectNumber) !== null && _g !== void 0 ? _g : '', 10);

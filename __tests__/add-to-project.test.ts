@@ -572,19 +572,24 @@ describe('addToProject', () => {
     const infoSpy = jest.spyOn(core, 'info')
     const gqlMock = mockGraphQL()
     await expect(addToProject()).rejects.toThrow(
-      'Invalid project URL: https://github.com/orgs/github/repositories. Project URL should match the format <GitHub server domain name>/<orgs-or-users>/<ownerName>/projects/<projectNumber>',
+      'https://github.com/orgs/github/repositories. Project URL should match the format https://github.com/<orgs-or-users>/<ownerName>/projects/<projectNumber>',
     )
     expect(infoSpy).not.toHaveBeenCalled()
     expect(gqlMock).not.toHaveBeenCalled()
   })
 
-  test(`works with URLs that are not under the github.com domain`, async () => {
+  test(`throws an error when url isn't under the github.com domain`, async () => {
+    mockGetInput({
+      'project-url': 'https://notgithub.com/orgs/github/projects/1',
+      'github-token': 'gh_token',
+    })
+
     github.context.payload = {
       issue: {
         number: 1,
-        labels: [{name: 'bug'}],
+        labels: [],
         // eslint-disable-next-line camelcase
-        html_url: 'https://notgithub.com/actions/add-to-project/issues/74',
+        html_url: 'https://github.com/actions/add-to-project/issues/74',
       },
       repository: {
         name: 'add-to-project',
@@ -594,32 +599,13 @@ describe('addToProject', () => {
       },
     }
 
-    mockGraphQL(
-      {
-        test: /getProject/,
-        return: {
-          organization: {
-            projectV2: {
-              id: 'project-id',
-            },
-          },
-        },
-      },
-      {
-        test: /addProjectV2ItemById/,
-        return: {
-          addProjectV2ItemById: {
-            item: {
-              id: 'project-item-id',
-            },
-          },
-        },
-      },
+    const infoSpy = jest.spyOn(core, 'info')
+    const gqlMock = mockGraphQL()
+    await expect(addToProject()).rejects.toThrow(
+      'https://notgithub.com/orgs/github/projects/1. Project URL should match the format https://github.com/<orgs-or-users>/<ownerName>/projects/<projectNumber>',
     )
-
-    await addToProject()
-
-    expect(outputs.itemId).toEqual('project-item-id')
+    expect(infoSpy).not.toHaveBeenCalled()
+    expect(gqlMock).not.toHaveBeenCalled()
   })
 
   test('constructs the correct graphQL query given an organization owner', async () => {
