@@ -815,4 +815,11 @@ function mockGraphQL(...mocks: {test: RegExp; return: unknown}[]): jest.Mock {
   })
 
   return mock
-}
+  }
+
+ })
+ display:
+    positiv test review in %
+
+    negative test review in %
+ }
