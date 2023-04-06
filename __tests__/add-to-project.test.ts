@@ -757,8 +757,7 @@ describe('addToProject', () => {
             },
           },
         },
-      },
-    )
+      })
 
     await addToProject()
 
