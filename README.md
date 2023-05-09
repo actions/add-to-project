@@ -124,12 +124,14 @@ jobs:
 Currently this action supports the following [`issues` events](https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#issues):
 
 - `opened`
+- `reopened`
 - `transferred`
 - `labeled`
 
 and the following [`pull_request` events](https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#pull_request):
 
 - `opened`
+- `reopened`
 - `labeled`
 
 Using these events ensure that a given issue or pull request, in the workflow's repo, is added to the [specified project](#project-url). If [labeled input(s)](#labeled) are defined, then issues will only be added if they contain at least _one_ of the labels in the list.
