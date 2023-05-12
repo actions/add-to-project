@@ -16,6 +16,9 @@ inputs:
   label-operator:
     required: false
     description: The behavior of the labels filter, AND to match all labels, OR to match any label, NOT to exclude any listed label (default is OR)
+outputs:
+  itemId:
+    description: The ID of the item that was added to the project
 runs:
   using: 'node16'
   main: 'dist/index.js'
