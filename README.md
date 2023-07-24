@@ -142,7 +142,7 @@ Using these events ensure that a given issue or pull request, in the workflow's 
   token](https://github.com/settings/tokens/new) with `project` scope. For private repos you will also need `repo` scope.
   _See [Creating a personal access token](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token) for more information_
 
-    > **NOTE:** ℹ️ Use a classic token with full control of projects. Personal access tokens with fine grained access do not support the GraphQL API.
+  > **NOTE:** ℹ️ Use a classic token with full control of projects. Personal access tokens with fine grained access do not support the GraphQL API.
 
 - add the newly created PAT as a repository secret, this secret will be referenced by the [github-token input](#github-token)
   _See [Encrypted secrets](https://docs.github.com/en/actions/security-guides/encrypted-secrets#creating-encrypted-secrets-for-a-repository) for more information_
