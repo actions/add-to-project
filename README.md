@@ -7,7 +7,7 @@ Note that this action does not support [GitHub projects (classic)](https://docs.
 
 [![build-test](https://github.com/actions/add-to-project/actions/workflows/test.yml/badge.svg)](https://github.com/actions/add-to-project/actions/workflows/test.yml)
 
-> **NOTE:** ⚠️ This action no longer uses the deprecated ProjectNext API. If you are looking for the old version of that action, use version [v0.0.5](https://github.com/actions/add-to-project/releases/tag/v0.0.5).
+> **NOTE:** ⚠️ This action no longer uses the deprecated ProjectNext API. If you are looking for the old version of that action, use version [v0.0.3](https://github.com/actions/add-to-project/releases/tag/v0.0.3).
 
 ## Usage
 
