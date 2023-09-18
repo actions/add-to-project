@@ -1,0 +1,21 @@
+name: Add new Issues with `bug` label to `Projects Shared FR Triage`
+on:
+  issues:
+    types:
+      - opened
+  pull_request:
+    types:
+      - opened
+
+permissions:
+  contents: read
+
+jobs:
+  add-to-triage-project:
+    name: Add issue or pull request to project
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/add-to-project@d8e41a41861baa4c7af88a39f7692681e89f6668
+        with:
+          project-url: https://github.com/orgs/github/projects/4017
+          github-token: ${{ secrets.PROJECTS_FR_PROJECT_UPDATE_TOKEN }}
