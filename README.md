@@ -81,7 +81,7 @@ on:
 
 jobs:
   add-to-project:
-    name: Add issue to project
+    name: Add pull request to project
     runs-on: ubuntu-latest
     steps:
       - uses: actions/add-to-project@RELEASE_VERSION
