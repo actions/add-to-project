@@ -14,7 +14,7 @@
   "devDependencies": {
     "@github/prettier-config": "^0.0.6",
     "@types/jest": "^29.5.7",
-    "@types/node": "16.18.51",
+    "@types/node": "16.18.60",
     "@typescript-eslint/parser": "^6.9.1",
     "@typescript-eslint/eslint-plugin": "^6.7.0",
     "@vercel/ncc": "^0.38.0",
