@@ -20,5 +20,5 @@ outputs:
   itemId:
     description: The ID of the item that was added to the project
 runs:
-  using: 'node16'
+  using: 'node20'
   main: 'dist/index.js'
