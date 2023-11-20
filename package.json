@@ -19,7 +19,7 @@
     "@typescript-eslint/eslint-plugin": "^6.7.0",
     "@vercel/ncc": "^0.38.0",
     "concurrently": "^8.2.1",
-    "eslint": "^8.49.0",
+    "eslint": "^8.54.0",
     "eslint-plugin-github": "^4.10.0",
     "eslint-plugin-jest": "^27.6.0",
     "eslint-plugin-prettier": "^5.0.0",
