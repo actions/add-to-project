@@ -1,7 +1,7 @@
 import * as core from '@actions/core'
 import * as github from '@actions/github'
 
-import {addToProject, mustGetOwnerTypeQuery} from '../src/add-to-project'
+import {addToProject, mustGetOwnerTypeQuery, withRetries} from '../src/add-to-project'
 
 describe('addToProject', () => {
   let outputs: Record<string, string>
@@ -797,6 +797,29 @@ describe('mustGetOwnerTypeQuery', () => {
     expect(() => {
       mustGetOwnerTypeQuery('unknown')
     }).toThrow(`Unsupported ownerType: unknown. Must be one of 'orgs' or 'users'`)
+  })
+})
+
+describe('withRetries', () => {
+  test('should succeed on successful callback', async () => {
+    withRetries(0, 0, () => {
+      return Promise.resolve('some string')
+    }).then(data => {
+      expect(data).toBe('some string')
+    })
+  })
+
+  test('should fail when reaching retry limit', async () => {
+    let invocations = 0
+
+    expect(() =>
+      withRetries(0, 3, () => {
+        invocations = invocations + 1
+        throw new Error('some error')
+      }),
+    ).toThrow('some error')
+
+    expect(invocations).toEqual(4)
   })
 })
 

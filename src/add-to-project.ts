@@ -43,6 +43,8 @@ export async function addToProject(): Promise<void> {
       .map(l => l.trim().toLowerCase())
       .filter(l => l.length > 0) ?? []
   const labelOperator = core.getInput('label-operator').trim().toLocaleLowerCase()
+  const inputRetryLimit = core.getInput('retry-limit')
+  const retryLimit = inputRetryLimit ? Number(inputRetryLimit) : 0
 
   const octokit = github.getOctokit(ghToken)
 
@@ -117,44 +119,57 @@ export async function addToProject(): Promise<void> {
   if (issueOwnerName === projectOwnerName) {
     core.info('Creating project item')
 
-    const addResp = await octokit.graphql<ProjectAddItemResponse>(
-      `mutation addIssueToProject($input: AddProjectV2ItemByIdInput!) {
-        addProjectV2ItemById(input: $input) {
-          item {
-            id
+    const addResp = await withRetries(0, retryLimit, () =>
+      octokit.graphql<ProjectAddItemResponse>(
+        `mutation addIssueToProject($input: AddProjectV2ItemByIdInput!) {
+          addProjectV2ItemById(input: $input) {
+            item {
+              id
+            }
           }
-        }
-      }`,
-      {
-        input: {
-          projectId,
-          contentId,
+        }`,
+        {
+          input: {
+            projectId,
+            contentId,
+          },
         },
-      },
+      ),
     )
 
     core.setOutput('itemId', addResp.addProjectV2ItemById.item.id)
   } else {
     core.info('Creating draft issue in project')
 
-    const addResp = await octokit.graphql<ProjectV2AddDraftIssueResponse>(
-      `mutation addDraftIssueToProject($projectId: ID!, $title: String!) {
-        addProjectV2DraftIssue(input: {
-          projectId: $projectId,
-          title: $title
-        }) {
-          projectItem {
-            id
+    const addResp = await withRetries(0, retryLimit, () =>
+      octokit.graphql<ProjectV2AddDraftIssueResponse>(
+        `mutation addDraftIssueToProject($projectId: ID!, $title: String!) {
+          addProjectV2DraftIssue(input: {
+            projectId: $projectId,
+            title: $title
+          }) {
+            projectItem {
+              id
+            }
           }
-        }
-      }`,
-      {
-        projectId,
-        title: issue?.html_url,
-      },
+        }`,
+        {
+          projectId,
+          title: issue?.html_url,
+        },
+      ),
     )
 
     core.setOutput('itemId', addResp.addProjectV2DraftIssue.projectItem.id)
+  }
+}
+
+export function withRetries<T>(retryNumber: number, retryLimit: number, callback: () => Promise<T>): Promise<T> {
+  try {
+    return callback()
+  } catch (err) {
+    if (retryNumber < retryLimit) return withRetries(retryNumber + 1, retryLimit, callback)
+    else throw err
   }
 }
 
