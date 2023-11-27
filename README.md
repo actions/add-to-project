@@ -157,6 +157,7 @@ Use the [Add To GitHub Projects](https://github.com/marketplace/actions/add-to-g
 ## Development
 
 To get started contributing to this project, clone it and install dependencies.
+If you have made any changes that you want to contribute back to the project fork this repository and create a PR on that fork. 
 Note that this action runs in Node.js 16.x, so we recommend using that version
 of Node (see "engines" in this action's package.json for details).
 
