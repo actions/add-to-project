@@ -1,0 +1,3 @@
+[![i18n - Curriculum PR Validation](https://github.com/freeCodeCamp/freeCodeCamp/actions/workflows/i18n-validate-prs.yml/badge.svg)](https://github.com/freeCodeCamp/freeCodeCamp/actions/workflows/i18n-validate-prs.yml)
+git commit --amend
+git push origin HEAD:refs/for/upstream/master
