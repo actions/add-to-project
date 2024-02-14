@@ -3,6 +3,7 @@ description: Automatically add issues and PRs to GitHub projects
 author: GitHub
 branding:
   icon: table
+  color: white
 inputs:
   project-url:
     required: true
