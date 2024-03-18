@@ -45,8 +45,9 @@ jobs:
         run: |
           CHANGED_FILES=$(git diff --ignore-space-at-eol --name-only dist/ | grep -vE "$FILES_TO_IGNORE")
           if [ -n "$CHANGED_FILES" ]; then
-            echo "Detected uncommitted changes after build (see diff output below)." >&2
+            echo "❗️ Detected uncommitted changes after build (see diff output below)." >&2
             echo "This indicates that the dist/ directory is out of sync with the checked-in index.js." >&2
+            echo "⭐️ If the changes below are expected, run 'npm run build:compile && npm run build:package' and commit the output files." >&2
             # Run `git diff` for each line/file in $CHANGED_FILES:
             echo "$CHANGED_FILES" | xargs -I {} git diff --ignore-space-at-eol --text -- {}
             exit 1
