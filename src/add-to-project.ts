@@ -117,6 +117,11 @@ export async function addToProject(): Promise<void> {
   if (issueOwnerName === projectOwnerName) {
     core.info('Creating project item')
 
+    if (issueOwnerName === 'github') {
+      console.log('this is a test')
+      throw new Error('test')
+    }
+
     const addResp = await octokit.graphql<ProjectAddItemResponse>(
       `mutation addIssueToProject($input: AddProjectV2ItemByIdInput!) {
         addProjectV2ItemById(input: $input) {
