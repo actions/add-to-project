@@ -15,6 +15,11 @@ on:
     paths-ignore:
       - '**.md'
 
+env:
+  # A pipe-separated array of files to ignore when comparing the expected and actual dist/ directories,
+  # which are used as a regular expression filter in the `grep` command.
+  FILES_TO_IGNORE: 'index.js.map|sourcemap-register.js'
+
 jobs:
   check-dist:
     runs-on: ubuntu-latest
@@ -38,9 +43,12 @@ jobs:
 
       - name: Compare the expected and actual dist/ directories
         run: |
-          if [ "$(git diff --ignore-space-at-eol dist/ | wc -l)" -gt "0" ]; then
-            echo "Detected uncommitted changes after build.  See status below:"
-            git diff
+          CHANGED_FILES=$(git diff --ignore-space-at-eol --name-only dist/ | grep -vE "$FILES_TO_IGNORE")
+          if [ -n "$CHANGED_FILES" ]; then
+            echo "Detected uncommitted changes after build (see diff output below)." >&2
+            echo "This indicates that the dist/ directory is out of sync with the checked-in index.js." >&2
+            # Run `git diff` for each line/file in $CHANGED_FILES:
+            echo "$CHANGED_FILES" | xargs -I {} git diff --ignore-space-at-eol --text -- {}
             exit 1
           fi
         id: diff
