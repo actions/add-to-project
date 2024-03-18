@@ -43,7 +43,9 @@ jobs:
 
       - name: Compare the expected and actual dist/ directories
         run: |
-          CHANGED_FILES=$(git diff --ignore-space-at-eol --name-only dist/ | grep -vE "$FILES_TO_IGNORE")
+          # Get a list of files that are different between the checked-in dist/ directory and the generated dist/ directory,
+          # then trim the list to remove any leading or trailing whitespace.
+          CHANGED_FILES=$(git diff --ignore-space-at-eol --name-only dist/ | grep -vE "$FILES_TO_IGNORE" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
           if [ -n "$CHANGED_FILES" ]; then
             echo "\n❗️ Detected uncommitted changes after build (see diff output below)." >&2
             echo "This indicates that the dist/ directory is out of sync with the checked-in index.js.\n" >&2
