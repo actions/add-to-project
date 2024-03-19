@@ -44,8 +44,8 @@ const core = __importStar(__nccwpck_require__(2186));
 const github = __importStar(__nccwpck_require__(5438));
 const urlParse = /\/(?<ownerType>orgs|users)\/(?<ownerName>[^/]+)\/projects\/(?<projectNumber>\d+)/;
 function addToProject() {
-    var _a, _b, _c, _d, _e, _f, _g, _h, _j;
     return __awaiter(this, void 0, void 0, function* () {
+        var _a, _b, _c, _d, _e, _f, _g, _h, _j;
         const projectUrl = core.getInput('project-url', { required: true });
         const ghToken = core.getInput('github-token', { required: true });
         const labeled = (_a = core
