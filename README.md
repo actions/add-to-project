@@ -7,8 +7,6 @@ Note that this action does not support [GitHub projects (classic)](https://docs.
 
 [![build-test](https://github.com/actions/add-to-project/actions/workflows/test.yml/badge.svg)](https://github.com/actions/add-to-project/actions/workflows/test.yml)
 
-> **NOTE:** ⚠️ This action no longer uses the deprecated ProjectNext API. If you are looking for the old version of that action, use version [v0.0.5](https://github.com/actions/add-to-project/releases/tag/v0.0.5).
-
 ## Usage
 
 _See [action.yml](action.yml) for [metadata](https://docs.github.com/en/actions/creating-actions/metadata-syntax-for-github-actions) that defines the inputs, outputs, and runs configuration for this action._
@@ -140,10 +138,8 @@ Using these events ensure that a given issue or pull request, in the workflow's 
 ## Creating a PAT and adding it to your repository
 
 - create a new [personal access
-  token](https://github.com/settings/tokens/new) with `project` scope. For private repos you will also need `repo` scope.
+  token](https://github.com/settings/tokens/new) with `project` scope. For private repos you will also need `repo` scope. For fine-grained access tokens, you will need to add the organization projects permission, and the repository issues and pull requests permissions.
   _See [Creating a personal access token](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token) for more information_
-
-  > **NOTE:** ℹ️ Use a classic token with full control of projects. Personal access tokens with fine grained access do not support the GraphQL API.
 
 - add the newly created PAT as a repository secret, this secret will be referenced by the [github-token input](#github-token)
   _See [Encrypted secrets](https://docs.github.com/en/actions/security-guides/encrypted-secrets#creating-encrypted-secrets-for-a-repository) for more information_
@@ -157,8 +153,7 @@ Use the [Add To GitHub Projects](https://github.com/marketplace/actions/add-to-g
 ## Development
 
 To get started contributing to this project, clone it and install dependencies.
-If you have made any changes that you want to contribute back to the project fork this repository and create a PR on that fork. 
-Note that this action runs in Node.js 16.x, so we recommend using that version
+Note that this action runs in Node.js 20.x, so we recommend using that version
 of Node (see "engines" in this action's package.json for details).
 
 ```shell
@@ -187,6 +182,6 @@ the "dist/" directory.
 
 Now, a release can be created from the branch containing the built action.
 
-# License
+## License
 
 The scripts and documentation in this project are released under the [MIT License](LICENSE)
