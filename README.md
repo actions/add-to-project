@@ -136,9 +136,9 @@ Using these events ensure that a given issue or pull request, in the workflow's 
 
 ## Creating a PAT and adding it to your repository
 
-- create a new [personal access
-  token](https://github.com/settings/tokens/new) with `project` scope. For private repos you will also need `repo` scope. For fine-grained access tokens, you will need to add the organization projects permission, and the repository issues and pull requests permissions.
-  _See [Creating a personal access token](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token) for more information_
+- Create a new [personal access token](https://github.com/settings/tokens/new). _See [Creating a personal access token](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token) for more information_
+  - For **Tokens (classic)** include the `project` scope; for private repos you will also need `repo` scope.
+  - For **Fine-grained tokens**, you must first select the appropriate _owner_ and associated _repositories_. Then select _Organization permissions -> `projects` `read & write`_, and _Repository permissions -> `issues` `read-only`_ and _`pull requests` `read-only`_.
 
 - add the newly created PAT as a repository secret, this secret will be referenced by the [github-token input](#github-token)
   _See [Encrypted secrets](https://docs.github.com/en/actions/security-guides/encrypted-secrets#creating-encrypted-secrets-for-a-repository) for more information_
