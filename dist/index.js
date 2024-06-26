@@ -29,105 +29,96 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.mustGetOwnerTypeQuery = exports.addToProject = void 0;
+exports.addToProject = addToProject;
+exports.mustGetOwnerTypeQuery = mustGetOwnerTypeQuery;
 const core = __importStar(__nccwpck_require__(2186));
 const github = __importStar(__nccwpck_require__(5438));
 const urlParse = /\/(?<ownerType>orgs|users)\/(?<ownerName>[^/]+)\/projects\/(?<projectNumber>\d+)/;
-function addToProject() {
-    return __awaiter(this, void 0, void 0, function* () {
-        var _a, _b, _c, _d, _e, _f, _g, _h, _j;
-        const projectUrl = core.getInput('project-url', { required: true });
-        const ghToken = core.getInput('github-token', { required: true });
-        const labeled = (_a = core
-            .getInput('labeled')
-            .split(',')
-            .map(l => l.trim().toLowerCase())
-            .filter(l => l.length > 0)) !== null && _a !== void 0 ? _a : [];
-        const labelOperator = core.getInput('label-operator').trim().toLocaleLowerCase();
-        const octokit = github.getOctokit(ghToken);
-        const issue = (_b = github.context.payload.issue) !== null && _b !== void 0 ? _b : github.context.payload.pull_request;
-        const issueLabels = ((_c = issue === null || issue === void 0 ? void 0 : issue.labels) !== null && _c !== void 0 ? _c : []).map((l) => l.name.toLowerCase());
-        const issueOwnerName = (_d = github.context.payload.repository) === null || _d === void 0 ? void 0 : _d.owner.login;
-        core.debug(`Issue/PR owner: ${issueOwnerName}`);
-        core.debug(`Issue/PR labels: ${issueLabels.join(', ')}`);
-        // Ensure the issue matches our `labeled` filter based on the label-operator.
-        if (labelOperator === 'and') {
-            if (!labeled.every(l => issueLabels.includes(l))) {
-                core.info(`Skipping issue ${issue === null || issue === void 0 ? void 0 : issue.number} because it doesn't match all the labels: ${labeled.join(', ')}`);
-                return;
-            }
+async function addToProject() {
+    var _a, _b, _c, _d, _e, _f, _g, _h, _j;
+    const projectUrl = core.getInput('project-url', { required: true });
+    const ghToken = core.getInput('github-token', { required: true });
+    const labeled = (_a = core
+        .getInput('labeled')
+        .split(',')
+        .map(l => l.trim().toLowerCase())
+        .filter(l => l.length > 0)) !== null && _a !== void 0 ? _a : [];
+    const labelOperator = core.getInput('label-operator').trim().toLocaleLowerCase();
+    const octokit = github.getOctokit(ghToken);
+    const issue = (_b = github.context.payload.issue) !== null && _b !== void 0 ? _b : github.context.payload.pull_request;
+    const issueLabels = ((_c = issue === null || issue === void 0 ? void 0 : issue.labels) !== null && _c !== void 0 ? _c : []).map((l) => l.name.toLowerCase());
+    const issueOwnerName = (_d = github.context.payload.repository) === null || _d === void 0 ? void 0 : _d.owner.login;
+    core.debug(`Issue/PR owner: ${issueOwnerName}`);
+    core.debug(`Issue/PR labels: ${issueLabels.join(', ')}`);
+    // Ensure the issue matches our `labeled` filter based on the label-operator.
+    if (labelOperator === 'and') {
+        if (!labeled.every(l => issueLabels.includes(l))) {
+            core.info(`Skipping issue ${issue === null || issue === void 0 ? void 0 : issue.number} because it doesn't match all the labels: ${labeled.join(', ')}`);
+            return;
         }
-        else if (labelOperator === 'not') {
-            if (labeled.length > 0 && issueLabels.some(l => labeled.includes(l))) {
-                core.info(`Skipping issue ${issue === null || issue === void 0 ? void 0 : issue.number} because it contains one of the labels: ${labeled.join(', ')}`);
-                return;
-            }
+    }
+    else if (labelOperator === 'not') {
+        if (labeled.length > 0 && issueLabels.some(l => labeled.includes(l))) {
+            core.info(`Skipping issue ${issue === null || issue === void 0 ? void 0 : issue.number} because it contains one of the labels: ${labeled.join(', ')}`);
+            return;
         }
-        else {
-            if (labeled.length > 0 && !issueLabels.some(l => labeled.includes(l))) {
-                core.info(`Skipping issue ${issue === null || issue === void 0 ? void 0 : issue.number} because it does not have one of the labels: ${labeled.join(', ')}`);
-                return;
-            }
+    }
+    else {
+        if (labeled.length > 0 && !issueLabels.some(l => labeled.includes(l))) {
+            core.info(`Skipping issue ${issue === null || issue === void 0 ? void 0 : issue.number} because it does not have one of the labels: ${labeled.join(', ')}`);
+            return;
         }
-        core.debug(`Project URL: ${projectUrl}`);
-        const urlMatch = projectUrl.match(urlParse);
-        if (!urlMatch) {
-            throw new Error(`Invalid project URL: ${projectUrl}. Project URL should match the format <GitHub server domain name>/<orgs-or-users>/<ownerName>/projects/<projectNumber>`);
-        }
-        const projectOwnerName = (_e = urlMatch.groups) === null || _e === void 0 ? void 0 : _e.ownerName;
-        const projectNumber = parseInt((_g = (_f = urlMatch.groups) === null || _f === void 0 ? void 0 : _f.projectNumber) !== null && _g !== void 0 ? _g : '', 10);
-        const ownerType = (_h = urlMatch.groups) === null || _h === void 0 ? void 0 : _h.ownerType;
-        const ownerTypeQuery = mustGetOwnerTypeQuery(ownerType);
-        core.debug(`Project owner: ${projectOwnerName}`);
-        core.debug(`Project number: ${projectNumber}`);
-        core.debug(`Project owner type: ${ownerType}`);
-        // First, use the GraphQL API to request the project's node ID.
-        const idResp = yield octokit.graphql(`query getProject($projectOwnerName: String!, $projectNumber: Int!) {
+    }
+    core.debug(`Project URL: ${projectUrl}`);
+    const urlMatch = projectUrl.match(urlParse);
+    if (!urlMatch) {
+        throw new Error(`Invalid project URL: ${projectUrl}. Project URL should match the format <GitHub server domain name>/<orgs-or-users>/<ownerName>/projects/<projectNumber>`);
+    }
+    const projectOwnerName = (_e = urlMatch.groups) === null || _e === void 0 ? void 0 : _e.ownerName;
+    const projectNumber = parseInt((_g = (_f = urlMatch.groups) === null || _f === void 0 ? void 0 : _f.projectNumber) !== null && _g !== void 0 ? _g : '', 10);
+    const ownerType = (_h = urlMatch.groups) === null || _h === void 0 ? void 0 : _h.ownerType;
+    const ownerTypeQuery = mustGetOwnerTypeQuery(ownerType);
+    core.debug(`Project owner: ${projectOwnerName}`);
+    core.debug(`Project number: ${projectNumber}`);
+    core.debug(`Project owner type: ${ownerType}`);
+    // First, use the GraphQL API to request the project's node ID.
+    const idResp = await octokit.graphql(`query getProject($projectOwnerName: String!, $projectNumber: Int!) {
       ${ownerTypeQuery}(login: $projectOwnerName) {
         projectV2(number: $projectNumber) {
           id
         }
       }
     }`, {
-            projectOwnerName,
-            projectNumber,
-        });
-        const projectId = (_j = idResp[ownerTypeQuery]) === null || _j === void 0 ? void 0 : _j.projectV2.id;
-        const contentId = issue === null || issue === void 0 ? void 0 : issue.node_id;
-        core.debug(`Project node ID: ${projectId}`);
-        core.debug(`Content ID: ${contentId}`);
-        // Next, use the GraphQL API to add the issue to the project.
-        // If the issue has the same owner as the project, we can directly
-        // add a project item. Otherwise, we add a draft issue.
-        if (issueOwnerName === projectOwnerName) {
-            core.info('Creating project item');
-            const addResp = yield octokit.graphql(`mutation addIssueToProject($input: AddProjectV2ItemByIdInput!) {
+        projectOwnerName,
+        projectNumber,
+    });
+    const projectId = (_j = idResp[ownerTypeQuery]) === null || _j === void 0 ? void 0 : _j.projectV2.id;
+    const contentId = issue === null || issue === void 0 ? void 0 : issue.node_id;
+    core.debug(`Project node ID: ${projectId}`);
+    core.debug(`Content ID: ${contentId}`);
+    // Next, use the GraphQL API to add the issue to the project.
+    // If the issue has the same owner as the project, we can directly
+    // add a project item. Otherwise, we add a draft issue.
+    if (issueOwnerName === projectOwnerName) {
+        core.info('Creating project item');
+        const addResp = await octokit.graphql(`mutation addIssueToProject($input: AddProjectV2ItemByIdInput!) {
         addProjectV2ItemById(input: $input) {
           item {
             id
           }
         }
       }`, {
-                input: {
-                    projectId,
-                    contentId,
-                },
-            });
-            core.setOutput('itemId', addResp.addProjectV2ItemById.item.id);
-        }
-        else {
-            core.info('Creating draft issue in project');
-            const addResp = yield octokit.graphql(`mutation addDraftIssueToProject($projectId: ID!, $title: String!) {
+            input: {
+                projectId,
+                contentId,
+            },
+        });
+        core.setOutput('itemId', addResp.addProjectV2ItemById.item.id);
+    }
+    else {
+        core.info('Creating draft issue in project');
+        const addResp = await octokit.graphql(`mutation addDraftIssueToProject($projectId: ID!, $title: String!) {
         addProjectV2DraftIssue(input: {
           projectId: $projectId,
           title: $title
@@ -137,14 +128,12 @@ function addToProject() {
           }
         }
       }`, {
-                projectId,
-                title: issue === null || issue === void 0 ? void 0 : issue.html_url,
-            });
-            core.setOutput('itemId', addResp.addProjectV2DraftIssue.projectItem.id);
-        }
-    });
+            projectId,
+            title: issue === null || issue === void 0 ? void 0 : issue.html_url,
+        });
+        core.setOutput('itemId', addResp.addProjectV2DraftIssue.projectItem.id);
+    }
 }
-exports.addToProject = addToProject;
 function mustGetOwnerTypeQuery(ownerType) {
     const ownerTypeQuery = ownerType === 'orgs' ? 'organization' : ownerType === 'users' ? 'user' : null;
     if (!ownerTypeQuery) {
@@ -152,7 +141,6 @@ function mustGetOwnerTypeQuery(ownerType) {
     }
     return ownerTypeQuery;
 }
-exports.mustGetOwnerTypeQuery = mustGetOwnerTypeQuery;
 
 
 /***/ }),
