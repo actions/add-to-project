@@ -15,6 +15,11 @@ on:
     paths-ignore:
       - '**.md'
 
+env:
+  # A pipe-separated array of files to ignore when comparing the expected and actual dist/ directories,
+  # which are used as a regular expression filter in the `grep` command.
+  FILES_TO_IGNORE: 'index.js.map|sourcemap-register.js'
+
 jobs:
   check-dist:
     runs-on: ubuntu-latest
@@ -23,7 +28,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Set Node.js 20.x
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: 20.x
           cache: npm
@@ -38,15 +43,23 @@ jobs:
 
       - name: Compare the expected and actual dist/ directories
         run: |
-          if [ "$(git diff --ignore-space-at-eol dist/ | wc -l)" -gt "0" ]; then
-            echo "Detected uncommitted changes after build.  See status below:"
-            git diff
+          # Get a list of files that are different between the checked-in dist/ directory and the generated dist/ directory,
+          # then trim the list to remove any leading or trailing whitespace.
+          CHANGED_FILES=$(git diff --ignore-space-at-eol --name-only dist/ | grep -vE "$FILES_TO_IGNORE" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
+          if [ -n "$CHANGED_FILES" ]; then
+            echo "❗️ Detected uncommitted changes after build (see diff output below)." >&2
+            echo "This indicates that the dist/ directory is out of sync with the checked-in index.js." >&2
+            echo "⭐️ If the changes below are expected, run 'npm run build:compile && npm run build:package' and commit the output files." >&2
+            # Run `git diff` for each line/file in $CHANGED_FILES:
+            echo "$CHANGED_FILES" | xargs -I {} git diff --ignore-space-at-eol --text -- {}
             exit 1
+          else
+            echo "✅ No uncommitted changes detected after build."
           fi
         id: diff
 
       # If index.js was different than expected, upload the expected version as an artifact
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         if: ${{ failure() && steps.diff.conclusion == 'failure' }}
         with:
           name: dist
