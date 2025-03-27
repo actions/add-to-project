@@ -16,7 +16,9 @@ jobs:
       - uses: actions/checkout@v4
         with:
           token: ${{ secrets.PAT }}
+
       - run: npm ci
+
       - name: Install licensed
         run: |
           cd $RUNNER_TEMP
@@ -31,8 +33,6 @@ jobs:
           npm run build:package
 
       - name: Commit changes as Dependabot
-        with:
-          token: ${{ secrets.PAT }}
         run: |
           git config --global user.name 'dependabot[bot]'
           git config --global user.email '49699333+dependabot[bot]@users.noreply.github.com'
