@@ -1,0 +1,38 @@
+name: Update Dependencies
+on:
+  push:
+    branches:
+      - dependabot/npm_and_yarn/**
+  pull_request:
+    branches:
+      - dependabot/npm_and_yarn/**
+
+jobs:
+  run:
+    name: Update licensed cache
+    steps:
+      - uses: actions/checkout@v4
+      - run: npm ci
+      - name: Install licensed
+        run: |
+          cd $RUNNER_TEMP
+          curl -Lfs -o licensed.tar.gz https://github.com/github/licensed/releases/download/3.6.0/licensed-3.6.0-linux-x64.tar.gz
+          sudo tar -xzf licensed.tar.gz
+          sudo mv licensed /usr/local/bin/licensed
+          licensed cache
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Rebuild the dist/ directory
+        run: |
+          npm run build:compile
+          npm run build:package
+
+      - name: Commit changes as Dependabot
+        run: |
+          git config user.name "dependabot[bot]"
+          git config user.email "49699333+dependabot[bot]@users.noreply.github.com"
+          git add .
+          git commit -m "Update licensed cache"
+          git push
