@@ -20,10 +20,7 @@ jobs:
           curl -Lfs -o licensed.tar.gz https://github.com/github/licensed/releases/download/3.6.0/licensed-3.6.0-linux-x64.tar.gz
           sudo tar -xzf licensed.tar.gz
           sudo mv licensed /usr/local/bin/licensed
-          licensed cache
-
-      - name: Install dependencies
-        run: npm ci
+      - run: licensed cache
 
       - name: Rebuild the dist/ directory
         run: |
