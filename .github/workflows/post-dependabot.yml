@@ -9,6 +9,7 @@ on:
 
 jobs:
   run:
+    runs-on: ubuntu-latest
     name: Update licensed cache
     steps:
       - uses: actions/checkout@v4
