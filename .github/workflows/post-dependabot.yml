@@ -5,7 +5,6 @@ on:
       branch:
         description: 'The branch to update dependencies on'
         required: true
-        default: 'warning'
         type: string
 
 permissions:
@@ -16,7 +15,8 @@ jobs:
     name: Update licensed cache
     steps:
       - uses: actions/checkout@v4
-        ref: ${{ github.event.inputs.branch }}
+        with:
+          ref: ${{ github.event.inputs.branch }}
 
       - run: npm ci
 
