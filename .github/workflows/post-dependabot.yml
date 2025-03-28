@@ -1,12 +1,11 @@
 name: Update Dependencies
 on:
-  workflow_dispatch:
-    inputs:
-      branch:
-        description: 'The branch to update dependencies on'
-        required: true
-        type: string
-
+  push:
+    branches:
+      - dependabot/npm_and_yarn/**
+  pull_request:
+    branches:
+      - dependabot/npm_and_yarn/**
 permissions:
   contents: write
 jobs:
@@ -15,8 +14,6 @@ jobs:
     name: Update licensed cache
     steps:
       - uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.inputs.branch }}
 
       - run: npm ci
 
