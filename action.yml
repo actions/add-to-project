@@ -17,6 +17,9 @@ inputs:
   label-operator:
     required: false
     description: The behavior of the labels filter, AND to match all labels, OR to match any label, NOT to exclude any listed label (default is OR)
+  retry-limit:
+    required: false
+    description: The number of retries used to add an item to a project (default is 0)
 outputs:
   itemId:
     description: The ID of the item that was added to the project
