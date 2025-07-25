@@ -24,7 +24,6 @@ jobs:
           sudo tar -xzf licensed.tar.gz
           sudo mv licensed /usr/local/bin/licensed
       - run: licensed cache
-
       - name: Rebuild the dist/ directory
         run: |
           npm run build:compile
