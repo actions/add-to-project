@@ -1,5 +1,3 @@
-permissions:
-  contents: read
 name: 'build-test'
 permissions:
   contents: read
