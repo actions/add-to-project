@@ -1,3 +1,5 @@
+permissions:
+  contents: read
 name: 'build-test'
 on: # rebuild any PRs and main branch changes
   workflow_dispatch:
