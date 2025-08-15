@@ -5068,7 +5068,7 @@ async function getResponseData(response) {
   if (/application\/json/.test(contentType)) {
     return response.json().catch(() => response.text()).catch(() => "");
   }
-  if (!contentType || /^text\/|charset=utf-8$/.test(contentType)) {
+  if (!contentType || /^(text\/|charset=utf-8)$/.test(contentType)) {
     return response.text();
   }
   return getBufferResponse(response);
