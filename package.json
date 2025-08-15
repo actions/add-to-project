@@ -8,8 +8,7 @@
     "@actions/github": "^6.0.0",
     "@octokit/plugin-paginate-rest": "^13.0.1",
     "@octokit/request": "^9.2.2",
-    "@octokit/request-error": "^6.1.7",
-    "patch-package": "^8.0.0"
+    "@octokit/request-error": "^6.1.7"
   },
   "engines": {
     "node": ">=20.0.0",
