@@ -5,44 +5,43 @@
  * Changes /^text\/|charset=utf-8$/ to /^text\/|charset=utf-8/
  */
 
-const fs = require('fs');
-const path = require('path');
+const fs = require('fs')
 
 const filesToFix = [
   'node_modules/@actions/github/node_modules/@octokit/request/dist-src/fetch-wrapper.js',
   'node_modules/@actions/github/node_modules/@octokit/request/dist-node/index.js',
-  'node_modules/@actions/github/node_modules/@octokit/request/dist-web/index.js'
-];
+  'node_modules/@actions/github/node_modules/@octokit/request/dist-web/index.js',
+]
 
-console.log('🔧 Applying regex fix for @octokit/request...');
+process.stdout.write('🔧 Applying regex fix for @octokit/request...\n')
 
-let filesFixed = 0;
+let filesFixed = 0
 
-filesToFix.forEach(filePath => {
+for (const filePath of filesToFix) {
   if (fs.existsSync(filePath)) {
     try {
-      let content = fs.readFileSync(filePath, 'utf8');
-      const originalContent = content;
-      
+      let content = fs.readFileSync(filePath, 'utf8')
+      const originalContent = content
+
       // Fix the problematic regex pattern - replace the end anchor version with the fixed version
-      content = content.replace(/charset=utf-8\$\//g, 'charset=utf-8/');
-      
+      content = content.replace(/charset=utf-8\$\//g, 'charset=utf-8/')
+
       if (content !== originalContent) {
-        fs.writeFileSync(filePath, content, 'utf8');
-        console.log(`✅ Fixed: ${filePath}`);
-        filesFixed++;
+        fs.writeFileSync(filePath, content, 'utf8')
+        process.stdout.write(`✅ Fixed: ${filePath}\n`)
+        filesFixed++
       } else {
-        console.log(`ℹ️  No changes needed: ${filePath}`);
+        process.stdout.write(`ℹ️  No changes needed: ${filePath}\n`)
       }
     } catch (error) {
-      console.error(`❌ Error fixing ${filePath}:`, error.message);
+      process.stderr.write(`❌ Error fixing ${filePath}: ${error.message}\n`)
     }
   } else {
-    console.log(`⚠️  File not found: ${filePath}`);
+    process.stdout.write(`⚠️  File not found: ${filePath}\n`)
   }
-});
+}
 
-console.log(`\n🎉 Fix complete! ${filesFixed} files updated.`);
+process.stdout.write(`\n🎉 Fix complete! ${filesFixed} files updated.\n`)
 if (filesFixed > 0) {
-  console.log('Run "npm run build:package" to rebuild with the fix.');
+  process.stdout.write('Run "npm run build:package" to rebuild with the fix.\n')
 }
