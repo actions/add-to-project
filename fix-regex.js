@@ -2,7 +2,7 @@
 
 /**
  * Fix for misleading operator precedence in @octokit/request regex
- * Changes /^text\/|charset=utf-8$/ to /^text\/|charset=utf-8/
+ * Changes /^text\/|charset=utf-8$/ to /^(text\/|charset=utf-8)$/
  */
 
 const fs = require('fs')
@@ -18,26 +18,27 @@ process.stdout.write('🔧 Applying regex fix for @octokit/request...\n')
 let filesFixed = 0
 
 for (const filePath of filesToFix) {
-    if (fs.existsSync(filePath)) {
-        try {
-            let content = fs.readFileSync(filePath, 'utf8')
-            const originalContent = content
+    try {
+        let content = fs.readFileSync(filePath, 'utf8')
+        const originalContent = content
 
-            // Fix the problematic regex pattern - replace the end anchor version with the fixed version
-            content = content.replace(/^text\/|charset=utf-8$\//g, '/^(text\/|charset=utf-8)$/')
+        // Fix the problematic regex pattern - add proper grouping to fix operator precedence
+        content = content.replace(/\/\^text\\?\/\|charset=utf-8\$?\//g, '/^(text\\/|charset=utf-8)$/')
+        content = content.replace(/\/\^text\/\|charset=utf-8\$?\//g, '/^(text/|charset=utf-8)$/')
 
-            if (content !== originalContent) {
-                fs.writeFileSync(filePath, content, 'utf8')
-                process.stdout.write(`✅ Fixed: ${filePath}\n`)
-                filesFixed++
-            } else {
-                process.stdout.write(`ℹ️  No changes needed: ${filePath}\n`)
-            }
-        } catch (error) {
+        if (content !== originalContent) {
+            fs.writeFileSync(filePath, content, 'utf8')
+            process.stdout.write(`✅ Fixed: ${filePath}\n`)
+            filesFixed++
+        } else {
+            process.stdout.write(`ℹ️  No changes needed: ${filePath}\n`)
+        }
+    } catch (error) {
+        if (error.code === 'ENOENT') {
+            process.stdout.write(`⚠️  File not found: ${filePath}\n`)
+        } else {
             process.stderr.write(`❌ Error fixing ${filePath}: ${error.message}\n`)
         }
-    } else {
-        process.stdout.write(`⚠️  File not found: ${filePath}\n`)
     }
 }
 
