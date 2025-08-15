@@ -24,7 +24,7 @@ for (const filePath of filesToFix) {
 
         // Fix the problematic regex pattern - add proper grouping to fix operator precedence
         content = content.replace(/\/\^text\\?\/\|charset=utf-8\$?\//g, '/^(text\\/|charset=utf-8)$/')
-        content = content.replace(/\/\^text\/\|charset=utf-8\$?\//g, '/^(text/|charset=utf-8)$/')
+        content = content.replace(/\/\^text\/\|charset=utf-8\$?\//g, '/^(text\\/|charset=utf-8)$/')
 
         if (content !== originalContent) {
             fs.writeFileSync(filePath, content, 'utf8')
