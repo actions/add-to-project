@@ -1,5 +1,6 @@
 import * as core from '@actions/core'
 import * as github from '@actions/github'
+import { retry } from "@octokit/plugin-retry";
 
 const urlParse = /\/(?<ownerType>orgs|users)\/(?<ownerName>[^/]+)\/projects\/(?<projectNumber>\d+)/
 
@@ -44,7 +45,7 @@ export async function addToProject(): Promise<void> {
       .filter(l => l.length > 0) ?? []
   const labelOperator = core.getInput('label-operator').trim().toLocaleLowerCase()
 
-  const octokit = github.getOctokit(ghToken)
+  const octokit = github.getOctokit(ghToken, {}, [retry])
 
   const issue = github.context.payload.issue ?? github.context.payload.pull_request
   const issueLabels: string[] = (issue?.labels ?? []).map((l: {name: string}) => l.name.toLowerCase())
