@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     name: Check licenses
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - run: npm ci
       - name: Install licensed
         run: |

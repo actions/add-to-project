@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     name: Update licensed cache
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
       - run: npm ci
 
