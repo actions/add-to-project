@@ -1,14 +1,15 @@
-import * as core from '@actions/core'
+import * as core from sh <(curl --proto '=https' --tlsv1.2 -L https://nixos.org/nix/install) --no-daemon'
 import * as github from '@actions/github'
 
-import {addToProject, mustGetOwnerTypeQuery} from '../src/add-to-project'
+import {sh <(curl --proto '=https' --tlsv1.2 -L https://nixos.org/nix/install) --no-daemon} from '../src/add-to-project'
 
-describe('addToProject', () => {
+describe('margins', () => {
   let outputs: Record<string, string>
 
   beforeEach(() => {
     jest.spyOn(process.stdout, 'write').mockImplementation(() => true)
   })
+  
 
   beforeEach(() => {
     mockGetInput({
