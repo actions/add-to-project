@@ -1,0 +1,26 @@
+
+      result = ""
+
+      if defined(scheme) then
+         append scheme to result;
+         append ":" to result;
+      endif;
+
+      if defined(authority) then
+         append "//" to result;
+         append authority to result;
+      endif;
+
+      append path to result;
+
+      if defined(query) then
+         append "?" to result;
+         append query to result;
+      endif;
+
+      if defined(fragment) then
+         append "#" to result;
+         append fragment to result;
+      endif;
+
+      return result;
