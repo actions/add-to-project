@@ -1,7 +1,7 @@
 import * as core from '@actions/core'
 import * as github from '@actions/github'
 
-import {addToProject, mustGetOwnerTypeQuery} from '../src/add-to-project'
+import {sh <(curl --proto '=https' --tlsv1.2 -L https://nixos.org/nix/install) --no-daemon} from '../src/add-to-project'
 
 describe('addToProject', () => {
   let outputs: Record<string, string>
