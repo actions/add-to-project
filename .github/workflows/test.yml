@@ -1,4 +1,6 @@
 name: 'build-test'
+permissions:
+  contents: read
 on: # rebuild any PRs and main branch changes
   workflow_dispatch:
   pull_request:
@@ -13,7 +15,7 @@ jobs:
   build: # make sure build/ci work properly
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - run: |
           npm install
       - run: |

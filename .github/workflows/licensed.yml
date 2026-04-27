@@ -1,4 +1,6 @@
 name: Licensed
+permissions:
+  contents: read
 
 on:
   push:
@@ -13,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     name: Check licenses
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - run: npm ci
       - name: Install licensed
         run: |
