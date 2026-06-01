@@ -11,7 +11,12 @@
     "@octokit/request-error": "^7.1.0"
   },
   "overrides": {
-    "undici": "^6.24.0"
+    "@actions/github": {
+      "undici": "^6.24.0"
+    },
+    "@actions/http-client": {
+      "undici": "^6.24.0"
+    }
   },
   "engines": {
     "node": ">=24.0.0",
