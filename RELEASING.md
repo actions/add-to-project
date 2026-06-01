@@ -90,18 +90,18 @@ refactor: simplify GraphQL query construction
 
 ### Types reference
 
-| Type | Description | Triggers release? |
-|------|-------------|-------------------|
-| `feat` | A new feature | ✅ Minor |
-| `fix` | A bug fix | ✅ Patch |
-| `perf` | Performance improvement | ✅ Patch |
-| `docs` | Documentation only | ❌ |
-| `chore` | Maintenance tasks | ❌ |
-| `ci` | CI/CD changes | ❌ |
-| `test` | Adding/updating tests | ❌ |
-| `refactor` | Code refactoring | ❌ |
-| `style` | Code style (formatting) | ❌ |
-| `build` | Build system changes | ❌ |
+| Type       | Description             | Triggers release? |
+| ---------- | ----------------------- | ----------------- |
+| `feat`     | A new feature           | ✅ Minor          |
+| `fix`      | A bug fix               | ✅ Patch          |
+| `perf`     | Performance improvement | ✅ Patch          |
+| `docs`     | Documentation only      | ❌                |
+| `chore`    | Maintenance tasks       | ❌                |
+| `ci`       | CI/CD changes           | ❌                |
+| `test`     | Adding/updating tests   | ❌                |
+| `refactor` | Code refactoring        | ❌                |
+| `style`    | Code style (formatting) | ❌                |
+| `build`    | Build system changes    | ❌                |
 
 ### Breaking changes
 
@@ -119,7 +119,7 @@ Workflows relying on the previous default must explicitly set `label-operator: O
 The major version tag (e.g., `v2`) is automatically updated to point to the latest release. This allows users to pin to a major version in their workflows:
 
 ```yaml
-- uses: actions/add-to-project@v2  # Always gets the latest v2.x.x
+- uses: actions/add-to-project@v2 # Always gets the latest v2.x.x
 ```
 
 ## Manual intervention
