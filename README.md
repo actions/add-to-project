@@ -167,19 +167,22 @@ See the [toolkit
 documentation](https://github.com/actions/toolkit/blob/master/README.md#packages)
 for the various packages used in building this action.
 
-## Publish to a distribution branch
+## Releasing
 
-Actions are run from GitHub repositories, so we check in the packaged action in
-the "dist/" directory.
+This project uses [semantic-release](https://github.com/semantic-release/semantic-release)
+to automate versioning and GitHub Releases. When a pull request is merged to `main`,
+the release workflow analyzes commit messages and—if a release is warranted—creates
+a new version tag, publishes a GitHub Release, and updates the major version tag
+(e.g., `v2`) to point to the latest release.
 
-```shell
-> npm run build
-> git add lib dist
-> git commit -a -m "Build and package"
-> git push origin releases/v1
-```
+Commit messages must follow [Conventional Commits](https://www.conventionalcommits.org/):
 
-Now, a release can be created from the branch containing the built action.
+- `fix: ...` → patch release
+- `feat: ...` → minor release
+- `BREAKING CHANGE` in footer → major release
+
+See [RELEASING.md](RELEASING.md) for full details on commit format, troubleshooting,
+and how the release process works.
 
 ## License
 
