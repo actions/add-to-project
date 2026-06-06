@@ -1,5 +1,5 @@
 name: Add To GitHub projects
-description: Automatically add issues and PRs to GitHub projects
+description: Automatically add issues and pull requests to GitHub projects
 author: GitHub
 branding:
   icon: table
@@ -13,13 +13,18 @@ inputs:
     description: A GitHub personal access token with write access to the project
   labeled:
     required: false
+    default: ''
     description: A comma-separated list of labels to use as a filter for issue to be added
   label-operator:
     required: false
+    default: 'OR'
     description: The behavior of the labels filter, AND to match all labels, OR to match any label, NOT to exclude any listed label (default is OR)
 outputs:
   itemId:
-    description: The ID of the item that was added to the project
+    description: >-
+      The node ID of the project item that was added. If the issue or pull request
+      belongs to a different owner than the project, a draft issue is created and
+      this is the ID of that draft item.
 runs:
   using: 'node24'
   main: 'dist/index.js'
