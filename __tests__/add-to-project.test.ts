@@ -112,6 +112,86 @@ describe('addToProject', () => {
     expect(outputs.itemId).toEqual('project-item-id')
   })
 
+  test('skips adding an issue when it already exists in the same project', async () => {
+    github.context.payload = {
+      issue: {
+        number: 1,
+        labels: [{name: 'bug'}],
+        // eslint-disable-next-line camelcase
+        html_url: 'https://github.com/actions/add-to-project/issues/74',
+      },
+      repository: {
+        name: 'add-to-project',
+        owner: {
+          login: 'actions',
+        },
+      },
+    }
+
+    const infoSpy = jest.spyOn(core, 'info')
+    mockGraphQL(
+      {
+        test: /getProject/,
+        return: {
+          organization: {
+            projectV2: {
+              id: 'project-id',
+            },
+          },
+        },
+      },
+      {
+        test: /addProjectV2ItemById/,
+        return: () => Promise.reject(new Error('Content already exists in this project')),
+      },
+    )
+
+    await addToProject()
+
+    expect(infoSpy).toHaveBeenCalledWith('Skipping issue 1 because it already exists in project')
+    expect(outputs.itemId).toBeUndefined()
+  })
+
+  test('skips creating a draft issue when the issue already exists in the project', async () => {
+    github.context.payload = {
+      issue: {
+        number: 2221,
+        labels: [{name: 'bug'}],
+        // eslint-disable-next-line camelcase
+        html_url: 'https://github.com/octokit/octokit.js/issues/2221',
+      },
+      repository: {
+        name: 'octokit.js',
+        owner: {
+          login: 'octokit',
+        },
+      },
+    }
+
+    const infoSpy = jest.spyOn(core, 'info')
+    mockGraphQL(
+      {
+        test: /getProject/,
+        return: {
+          organization: {
+            projectV2: {
+              id: 'project-id',
+            },
+          },
+        },
+      },
+      {
+        test: /addProjectV2DraftIssue/,
+        return: () => Promise.reject(new Error('Content already exists in this project')),
+      },
+    )
+
+    await addToProject()
+
+    expect(infoSpy).toHaveBeenCalledWith('Skipping issue 2221 because it already exists in project')
+    expect(outputs.itemId).toBeUndefined()
+  })
+
   test('adds matching issues with a label filter without label-operator', async () => {
     mockGetInput({
       'project-url': 'https://github.com/orgs/actions/projects/1',
@@ -816,7 +896,13 @@ function mockGraphQL(...mocks: {test: RegExp; return: unknown}[]): jest.Mock {
     const match = mocks.find(m => m.test.test(query))
 
     if (match) {
-      return match.return
+      const ret = match.return as unknown
+      if (typeof ret === 'function') {
+        // call factory to produce the return value (allows lazy rejection)
+        return (ret as Function)()
+      }
+
+      return ret
     }
 
     throw new Error(`Unexpected GraphQL query: ${query}`)
