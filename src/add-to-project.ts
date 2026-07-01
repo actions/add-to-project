@@ -116,8 +116,9 @@ export async function addToProject(): Promise<void> {
   // add a project item. Otherwise, we add a draft issue.
   if (issueOwnerName === projectOwnerName) {
     core.info('Creating project item')
-
-    const addResp = await octokit.graphql<ProjectAddItemResponse>(
+    
+    const addResp = await dupeSafeGraphql<ProjectAddItemResponse>(
+      octokit,
       `mutation addIssueToProject($input: AddProjectV2ItemByIdInput!) {
         addProjectV2ItemById(input: $input) {
           item {
@@ -131,13 +132,15 @@ export async function addToProject(): Promise<void> {
           contentId,
         },
       },
+     issue?.number,
     )
 
-    core.setOutput('itemId', addResp.addProjectV2ItemById.item.id)
+    core.setOutput('itemId', addResp?.addProjectV2ItemById.item.id)
   } else {
     core.info('Creating draft issue in project')
-
-    const addResp = await octokit.graphql<ProjectV2AddDraftIssueResponse>(
+    
+    const addResp = await dupeSafeGraphql<ProjectV2AddDraftIssueResponse>(
+      octokit,
       `mutation addDraftIssueToProject($projectId: ID!, $title: String!) {
         addProjectV2DraftIssue(input: {
           projectId: $projectId,
@@ -152,10 +155,39 @@ export async function addToProject(): Promise<void> {
         projectId,
         title: issue?.html_url,
       },
+      issue?.number,
     )
 
-    core.setOutput('itemId', addResp.addProjectV2DraftIssue.projectItem.id)
+    core.setOutput('itemId', addResp?.addProjectV2DraftIssue.projectItem.id)
   }
+}
+
+// This function wraps the octokit.graphql call to catch errors that indicate the content already exists in the project.
+async function dupeSafeGraphql<T>(
+  octokit: ReturnType<typeof github.getOctokit>,
+  query: string,
+  variables: Record<string, unknown> | undefined,
+  issueNumber?: number,
+): Promise<T | null> { 
+  try {
+    return await octokit.graphql<T>(query, variables)
+  } catch (error) {
+    if (isContentExtant(error)) {
+      core.info(`Skipping issue ${issueNumber} because it already exists in project`)
+      return Promise.resolve(null)
+    }
+
+    throw error
+  }
+}
+
+function isContentExtant(error: unknown): boolean {
+  if (error instanceof Error) {
+    const msg = error.message.toLowerCase()
+    return msg.includes('content already exists in this project')
+  }
+
+  return false
 }
 
 export function mustGetOwnerTypeQuery(ownerType?: string): 'organization' | 'user' {
