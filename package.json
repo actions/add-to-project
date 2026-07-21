@@ -12,10 +12,10 @@
   },
   "overrides": {
     "@actions/github": {
-      "undici": "^6.24.0"
+      "undici": "^6.27.0"
     },
     "@actions/http-client": {
-      "undici": "^6.24.0"
+      "undici": "^6.27.0"
     }
   },
   "engines": {
