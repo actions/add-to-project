@@ -16,6 +16,10 @@
     },
     "@actions/http-client": {
       "undici": "^6.27.0"
+    },
+    "js-yaml": "^4.3.1",
+    "@istanbuljs/load-nyc-config": {
+      "js-yaml": "^3.15.1"
     }
   },
   "engines": {
