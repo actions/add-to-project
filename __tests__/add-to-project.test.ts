@@ -899,7 +899,7 @@ function mockGraphQL(...mocks: {test: RegExp; return: unknown}[]): jest.Mock {
       const ret = match.return as unknown
       if (typeof ret === 'function') {
         // call factory to produce the return value (allows lazy rejection)
-        return (ret as Function)()
+        return (ret as () => void)()
       }
 
       return ret

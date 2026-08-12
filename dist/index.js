@@ -112,23 +112,33 @@ async function addToProject() {
     // add a project item. Otherwise, we add a draft issue.
     if (issueOwnerName === projectOwnerName) {
         core.info('Creating project item');
-        const addResp = await octokit.graphql(`mutation addIssueToProject($input: AddProjectV2ItemByIdInput!) {
-        addProjectV2ItemById(input: $input) {
-          item {
-            id
-          }
+        try {
+            const addResp = await octokit.graphql(`mutation addIssueToProject($input: AddProjectV2ItemByIdInput!) {
+              addProjectV2ItemById(input: $input) {
+                item {
+                  id
+                }
+              }
+            }`, {
+                input: {
+                    projectId,
+                    contentId,
+                },
+            });
+            core.setOutput('itemId', addResp.addProjectV2ItemById.item.id);
         }
-      }`, {
-            input: {
-                projectId,
-                contentId,
-            },
-        });
-        core.setOutput('itemId', addResp.addProjectV2ItemById.item.id);
+        catch (error) {
+            if (isAlreadyInProjectError(error)) {
+                core.info(`Skipping issue ${issue === null || issue === void 0 ? void 0 : issue.number} because it already exists in project`);
+                return;
+            }
+            throw error;
+        }
     }
     else {
         core.info('Creating draft issue in project');
-        const addResp = await octokit.graphql(`mutation addDraftIssueToProject($projectId: ID!, $title: String!) {
+        try {
+            const addResp = await octokit.graphql(`mutation addDraftIssueToProject($projectId: ID!, $title: String!) {
         addProjectV2DraftIssue(input: {
           projectId: $projectId,
           title: $title
@@ -138,11 +148,27 @@ async function addToProject() {
           }
         }
       }`, {
-            projectId,
-            title: issue === null || issue === void 0 ? void 0 : issue.html_url,
-        });
-        core.setOutput('itemId', addResp.addProjectV2DraftIssue.projectItem.id);
+                projectId,
+                title: issue === null || issue === void 0 ? void 0 : issue.html_url,
+            });
+            core.setOutput('itemId', addResp.addProjectV2DraftIssue.projectItem.id);
+        }
+        catch (error) {
+            if (isAlreadyInProjectError(error)) {
+                core.info(`Skipping issue ${issue === null || issue === void 0 ? void 0 : issue.number} because it already exists in project`);
+                return;
+            }
+            throw error;
+        }
     }
+}
+// inspect octokit.graphql response and trap for error that indicates content already exists in the project.
+function isAlreadyInProjectError(error) {
+    if (error instanceof Error) {
+        const msg = error.message.toLowerCase();
+        return msg.includes('content already exists in this project');
+    }
+    return false;
 }
 function mustGetOwnerTypeQuery(ownerType) {
     const ownerTypeQuery = ownerType === 'orgs' ? 'organization' : ownerType === 'users' ? 'user' : null;
@@ -10984,13 +11010,7 @@ function processHeader (request, key, val) {
       } else if (typeof val[i] === 'object') {
         throw new InvalidArgumentError(`invalid ${key} header`)
       } else {
-        // Coerce primitives (and reject unsafe coercions such as functions
-        // with a crafted toString/Symbol.toPrimitive).
-        const str = `${val[i]}`
-        if (!isValidHeaderValue(str)) {
-          throw new InvalidArgumentError(`invalid ${key} header`)
-        }
-        arr.push(str)
+        arr.push(`${val[i]}`)
       }
     }
     val = arr
@@ -11001,12 +11021,7 @@ function processHeader (request, key, val) {
   } else if (val === null) {
     val = ''
   } else {
-    // Coerce primitives (and reject unsafe coercions such as functions
-    // with a crafted toString/Symbol.toPrimitive).
     val = `${val}`
-    if (!isValidHeaderValue(val)) {
-      throw new InvalidArgumentError(`invalid ${key} header`)
-    }
   }
 
   if (headerName === 'host') {
@@ -12383,7 +12398,6 @@ const {
   RequestContentLengthMismatchError,
   ResponseContentLengthMismatchError,
   RequestAbortedError,
-  InvalidArgumentError,
   HeadersTimeoutError,
   HeadersOverflowError,
   SocketError,
@@ -12431,9 +12445,6 @@ const EMPTY_BUF = Buffer.alloc(0)
 const FastBuffer = Buffer[Symbol.species]
 const addListener = util.addListener
 const removeAllListeners = util.removeAllListeners
-const kIdleSocketValidation = Symbol('kIdleSocketValidation')
-const kIdleSocketValidationTimeout = Symbol('kIdleSocketValidationTimeout')
-const kSocketUsed = Symbol('kSocketUsed')
 
 let extractBody
 
@@ -12748,11 +12759,6 @@ class Parser {
       return -1
     }
 
-    if (client[kRunning] === 0) {
-      util.destroy(socket, new SocketError('bad response', util.getSocketInfo(socket)))
-      return -1
-    }
-
     const request = client[kQueue][client[kRunningIdx]]
     if (!request) {
       return -1
@@ -12853,11 +12859,6 @@ class Parser {
 
     /* istanbul ignore next: difficult to make a test case for */
     if (socket.destroyed) {
-      return -1
-    }
-
-    if (client[kRunning] === 0) {
-      util.destroy(socket, new SocketError('bad response', util.getSocketInfo(socket)))
       return -1
     }
 
@@ -13034,7 +13035,6 @@ class Parser {
     request.onComplete(headers)
 
     client[kQueue][client[kRunningIdx]++] = null
-    socket[kSocketUsed] = true
 
     if (socket[kWriting]) {
       assert(client[kRunning] === 0)
@@ -13093,9 +13093,6 @@ async function connectH1 (client, socket) {
   socket[kWriting] = false
   socket[kReset] = false
   socket[kBlocking] = false
-  socket[kIdleSocketValidation] = 0
-  socket[kIdleSocketValidationTimeout] = null
-  socket[kSocketUsed] = false
   socket[kParser] = new Parser(client, socket, llhttpInstance)
 
   addListener(socket, 'error', function (err) {
@@ -13141,8 +13138,6 @@ async function connectH1 (client, socket) {
   addListener(socket, 'close', function () {
     const client = this[kClient]
     const parser = this[kParser]
-
-    clearIdleSocketValidation(this)
 
     if (parser) {
       if (!this[kError] && parser.statusCode && !parser.shouldKeepAlive) {
@@ -13209,7 +13204,7 @@ async function connectH1 (client, socket) {
       return socket.destroyed
     },
     busy (request) {
-      if (socket[kWriting] || socket[kReset] || socket[kBlocking] || socket[kIdleSocketValidation] === 1) {
+      if (socket[kWriting] || socket[kReset] || socket[kBlocking]) {
         return true
       }
 
@@ -13247,31 +13242,6 @@ async function connectH1 (client, socket) {
   }
 }
 
-function clearIdleSocketValidation (socket) {
-  if (socket[kIdleSocketValidationTimeout]) {
-    clearTimeout(socket[kIdleSocketValidationTimeout])
-    socket[kIdleSocketValidationTimeout] = null
-  }
-
-  socket[kIdleSocketValidation] = 0
-}
-
-function scheduleIdleSocketValidation (client, socket) {
-  socket[kIdleSocketValidation] = 1
-  socket[kIdleSocketValidationTimeout] = setTimeout(() => {
-    socket[kIdleSocketValidationTimeout] = null
-    socket[kIdleSocketValidation] = 2
-
-    if (client[kSocket] === socket && !socket.destroyed) {
-      client[kResume]()
-    }
-  }, 0)
-  socket[kIdleSocketValidationTimeout].unref?.()
-}
-
-/**
- * @param {import('./client.js')} client
- */
 function resumeH1 (client) {
   const socket = client[kSocket]
 
@@ -13284,32 +13254,6 @@ function resumeH1 (client) {
     } else if (socket[kNoRef] && socket.ref) {
       socket.ref()
       socket[kNoRef] = false
-    }
-
-    if (client[kRunning] === 0 && client[kPending] > 0 && socket[kSocketUsed]) {
-      if (socket[kIdleSocketValidation] === 0) {
-        scheduleIdleSocketValidation(client, socket)
-        socket[kParser].readMore()
-        if (socket.destroyed) {
-          return
-        }
-        return
-      }
-
-      if (socket[kIdleSocketValidation] === 1) {
-        socket[kParser].readMore()
-        if (socket.destroyed) {
-          return
-        }
-        return
-      }
-    }
-
-    if (client[kRunning] === 0) {
-      socket[kParser].readMore()
-      if (socket.destroyed) {
-        return
-      }
     }
 
     if (client[kSize] === 0) {
@@ -13367,16 +13311,8 @@ function writeH1 (client, request) {
     }
     body = bodyStream.stream
     contentLength = bodyStream.length
-  } else if (util.isBlobLike(body) && request.contentType == null) {
-    const contentType = body.type
-    if (contentType) {
-      const contentTypeValue = `${contentType}`
-      if (!util.isValidHeaderValue(contentTypeValue)) {
-        util.errorRequest(client, request, new InvalidArgumentError('invalid content-type header'))
-        return false
-      }
-      headers.push('content-type', contentTypeValue)
-    }
+  } else if (util.isBlobLike(body) && request.contentType == null && body.type) {
+    headers.push('content-type', body.type)
   }
 
   if (body && typeof body.read === 'function') {
@@ -13413,7 +13349,6 @@ function writeH1 (client, request) {
   }
 
   const socket = client[kSocket]
-  clearIdleSocketValidation(socket)
 
   const abort = (err) => {
     if (request.aborted || request.completed) {
@@ -15286,7 +15221,6 @@ class DispatcherBase extends Dispatcher {
 
   get webSocketOptions () {
     return {
-      maxFragments: this[kWebSocketOptions].maxFragments ?? 131072,
       maxPayloadSize: this[kWebSocketOptions].maxPayloadSize ?? 128 * 1024 * 1024
     }
   }
@@ -16863,28 +16797,6 @@ function calculateRetryAfterHeader (retryAfter) {
   return new Date(retryAfter).getTime() - current
 }
 
-function validatePartialResponseContentLength (headers, range, statusCode, retryCount) {
-  const contentLength = headers['content-length']
-  if (contentLength == null) {
-    return null
-  }
-
-  if (!Number.isFinite(range.start) || !Number.isFinite(range.end)) {
-    return null
-  }
-
-  const length = Number(contentLength)
-  const expectedLength = range.end - range.start + 1
-  if (!Number.isFinite(length) || length !== expectedLength) {
-    return new RequestRetryError('Content-Length mismatch', statusCode, {
-      headers,
-      data: { count: retryCount }
-    })
-  }
-
-  return null
-}
-
 class RetryHandler {
   constructor (opts, handlers) {
     const { retryOptions, ...dispatchOpts } = opts
@@ -17099,12 +17011,6 @@ class RetryHandler {
         return false
       }
 
-      const contentLengthError = validatePartialResponseContentLength(headers, contentRange, statusCode, this.retryCount)
-      if (contentLengthError != null) {
-        this.abort(contentLengthError)
-        return false
-      }
-
       const { start, size, end = size - 1 } = contentRange
 
       assert(this.start === start, 'content-range mismatch')
@@ -17126,12 +17032,6 @@ class RetryHandler {
             resume,
             statusMessage
           )
-        }
-
-        const contentLengthError = validatePartialResponseContentLength(headers, range, statusCode, this.retryCount)
-        if (contentLengthError != null) {
-          this.abort(contentLengthError)
-          return false
         }
 
         const { start, size, end = size - 1 } = range
@@ -21257,25 +21157,32 @@ function parseUnparsedAttributes (unparsedAttributes, cookieAttributeList = {}) 
     // If the attribute-name case-insensitively matches the string
     // "SameSite", the user agent MUST process the cookie-av as follows:
 
-    const attributeValueLowercase = attributeValue.toLowerCase()
+    // 1. Let enforcement be "Default".
+    let enforcement = 'Default'
 
-    // 1. If cookie-av's attribute-value is a case-insensitive match for
-    //    "None", append an attribute to the cookie-attribute-list with an
-    //    attribute-name of "SameSite" and an attribute-value of "None".
-    if (attributeValueLowercase === 'none') {
-      cookieAttributeList.sameSite = 'None'
-    } else if (attributeValueLowercase === 'strict') {
-      // 2. If cookie-av's attribute-value is a case-insensitive match for
-      //    "Strict", append an attribute to the cookie-attribute-list with
-      //    an attribute-name of "SameSite" and an attribute-value of
-      //    "Strict".
-      cookieAttributeList.sameSite = 'Strict'
-    } else if (attributeValueLowercase === 'lax') {
-      // 3. If cookie-av's attribute-value is a case-insensitive match for
-      //    "Lax", append an attribute to the cookie-attribute-list with an
-      //    attribute-name of "SameSite" and an attribute-value of "Lax".
-      cookieAttributeList.sameSite = 'Lax'
+    const attributeValueLowercase = attributeValue.toLowerCase()
+    // 2. If cookie-av's attribute-value is a case-insensitive match for
+    //    "None", set enforcement to "None".
+    if (attributeValueLowercase.includes('none')) {
+      enforcement = 'None'
     }
+
+    // 3. If cookie-av's attribute-value is a case-insensitive match for
+    //    "Strict", set enforcement to "Strict".
+    if (attributeValueLowercase.includes('strict')) {
+      enforcement = 'Strict'
+    }
+
+    // 4. If cookie-av's attribute-value is a case-insensitive match for
+    //    "Lax", set enforcement to "Lax".
+    if (attributeValueLowercase.includes('lax')) {
+      enforcement = 'Lax'
+    }
+
+    // 5. Append an attribute to the cookie-attribute-list with an
+    //    attribute-name of "SameSite" and an attribute-value of
+    //    enforcement.
+    cookieAttributeList.sameSite = enforcement
   } else {
     cookieAttributeList.unparsed ??= []
 
@@ -21405,7 +21312,7 @@ function validateCookiePath (path) {
 
     if (
       code < 0x20 || // exclude CTLs (0-31)
-      code > 0x7E || // exclude DEL and non-ascii
+      code === 0x7F || // DEL
       code === 0x3B // ;
     ) {
       throw new Error('Invalid cookie path')
@@ -21414,80 +21321,16 @@ function validateCookiePath (path) {
 }
 
 /**
- * <let-dig> ::= <letter> | <digit>
- *
- * <letter> ::= any one of the 52 alphabetic characters A through Z in
- * upper case and a through z in lower case
- *
- * <digit> ::= any one of the ten digits 0 through 9r
- *
- * @see https://www.rfc-editor.org/rfc/rfc1034#section-3.5
- * @param {number} code
- */
-function isLetterOrDigit (code) {
-  return (
-    (code >= 0x30 && code <= 0x39) || // 0-9
-    (code >= 0x41 && code <= 0x5A) || // A-Z
-    (code >= 0x61 && code <= 0x7A) // a-z
-  )
-}
-
-/**
- * Validates a cookie domain against the "preferred name syntax".
- *
- * <domain>      ::= <subdomain> | " "
- * <subdomain>   ::= <label> | <subdomain> "." <label>
- * <label>       ::= <let-dig> [ [ <ldh-str> ] <let-dig> ]
- * <ldh-str>     ::= <let-dig-hyp> | <let-dig-hyp> <ldh-str>
- * <let-dig-hyp> ::= <let-dig> | "-"
- *
- * @see https://www.rfc-editor.org/rfc/rfc1034#section-3.5
- * @see https://www.rfc-editor.org/rfc/rfc1123#section-2.1
- * @see https://www.rfc-editor.org/rfc/rfc1035#section-2.3.4
+ * I have no idea why these values aren't allowed to be honest,
+ * but Deno tests these. - Khafra
  * @param {string} domain
  */
 function validateCookieDomain (domain) {
-  // <domain> ::= <subdomain> | " "
-  if (domain === ' ') {
-    return
-  }
-
-  if (domain.length > 255) {
-    throw new Error('Invalid cookie domain')
-  }
-
-  let labelLength = 0
-
-  for (let i = 0; i < domain.length; ++i) {
-    const code = domain.charCodeAt(i)
-
-    if (code === 0x2E) {
-      if (labelLength === 0) {
-        throw new Error('Invalid cookie domain')
-      }
-
-      if (domain.charCodeAt(i - 1) === 0x2D) { // "-"
-        throw new Error('Invalid cookie domain')
-      }
-
-      labelLength = 0
-      continue
-    }
-
-    if (labelLength === 0 && !isLetterOrDigit(code)) {
-      throw new Error('Invalid cookie domain')
-    }
-
-    if (!isLetterOrDigit(code) && code !== 0x2D) { // "-"
-      throw new Error('Invalid cookie domain')
-    }
-
-    if (++labelLength > 63) {
-      throw new Error('Invalid cookie domain')
-    }
-  }
-
-  if (labelLength === 0 || domain.charCodeAt(domain.length - 1) === 0x2D) { // "-"
+  if (
+    domain.startsWith('-') ||
+    domain.endsWith('.') ||
+    domain.endsWith('-')
+  ) {
     throw new Error('Invalid cookie domain')
   }
 }
@@ -21630,13 +21473,7 @@ function stringify (cookie) {
 
     const [key, ...value] = part.split('=')
 
-    const trimmedKey = key.trim()
-    const joinedValue = value.join('=')
-
-    validateCookieName(trimmedKey)
-    validateCookieValue(joinedValue)
-
-    out.push(`${trimmedKey}=${joinedValue}`)
+    out.push(`${key.trim()}=${value.join('=')}`)
   }
 
   return out.join('; ')
@@ -34171,11 +34008,6 @@ const { closeWebSocketConnection } = __nccwpck_require__(6897)
 const { PerMessageDeflate } = __nccwpck_require__(9469)
 const { MessageSizeExceededError } = __nccwpck_require__(8707)
 
-function failWebsocketConnectionWithCode (ws, code, reason) {
-  closeWebSocketConnection(ws, code, reason, Buffer.byteLength(reason))
-  failWebsocketConnection(ws, reason)
-}
-
 // This code was influenced by ws released under the MIT license.
 // Copyright (c) 2011 Einar Otto Stangvik <einaros@gmail.com>
 // Copyright (c) 2013 Arnout Kazemier and contributors
@@ -34196,22 +34028,18 @@ class ByteParser extends Writable {
   #extensions
 
   /** @type {number} */
-  #maxFragments
-
-  /** @type {number} */
   #maxPayloadSize
 
   /**
    * @param {import('./websocket').WebSocket} ws
    * @param {Map<string, string>|null} extensions
-   * @param {{ maxFragments?: number, maxPayloadSize?: number }} [options]
+   * @param {{ maxPayloadSize?: number }} [options]
    */
   constructor (ws, extensions, options = {}) {
     super()
 
     this.ws = ws
     this.#extensions = extensions == null ? new Map() : extensions
-    this.#maxFragments = options.maxFragments ?? 0
     this.#maxPayloadSize = options.maxPayloadSize ?? 0
 
     if (this.#extensions.has('permessage-deflate')) {
@@ -34235,9 +34063,9 @@ class ByteParser extends Writable {
     if (
       this.#maxPayloadSize > 0 &&
       !isControlFrame(this.#info.opcode) &&
-      this.#info.payloadLength + this.#fragmentsBytes > this.#maxPayloadSize
+      this.#info.payloadLength > this.#maxPayloadSize
     ) {
-      failWebsocketConnectionWithCode(this.ws, 1009, 'Payload size exceeds maximum allowed size')
+      failWebsocketConnection(this.ws, 'Payload size exceeds maximum allowed size')
       return false
     }
 
@@ -34402,12 +34230,10 @@ class ByteParser extends Writable {
           this.#state = parserStates.INFO
         } else {
           if (!this.#info.compressed) {
-            if (!this.writeFragments(body)) {
-              return
-            }
+            this.writeFragments(body)
 
             if (this.#maxPayloadSize > 0 && this.#fragmentsBytes > this.#maxPayloadSize) {
-              failWebsocketConnectionWithCode(this.ws, 1009, new MessageSizeExceededError().message)
+              failWebsocketConnection(this.ws, new MessageSizeExceededError().message)
               return
             }
 
@@ -34426,17 +34252,14 @@ class ByteParser extends Writable {
               this.#info.fin,
               (error, data) => {
                 if (error) {
-                  const code = error instanceof MessageSizeExceededError ? 1009 : 1007
-                  failWebsocketConnectionWithCode(this.ws, code, error.message)
+                  failWebsocketConnection(this.ws, error.message)
                   return
                 }
 
-                if (!this.writeFragments(data)) {
-                  return
-                }
+                this.writeFragments(data)
 
                 if (this.#maxPayloadSize > 0 && this.#fragmentsBytes > this.#maxPayloadSize) {
-                  failWebsocketConnectionWithCode(this.ws, 1009, new MessageSizeExceededError().message)
+                  failWebsocketConnection(this.ws, new MessageSizeExceededError().message)
                   return
                 }
 
@@ -34506,17 +34329,8 @@ class ByteParser extends Writable {
   }
 
   writeFragments (fragment) {
-    if (
-      this.#maxFragments > 0 &&
-      this.#fragments.length === this.#maxFragments
-    ) {
-      failWebsocketConnectionWithCode(this.ws, 1008, 'Too many message fragments')
-      return false
-    }
-
     this.#fragmentsBytes += fragment.length
     this.#fragments.push(fragment)
-    return true
   }
 
   consumeFragments () {
@@ -35569,12 +35383,9 @@ class WebSocket extends EventTarget {
     // once this happens, the connection is open
     this[kResponse] = response
 
-    const webSocketOptions = this[kController]?.dispatcher?.webSocketOptions
-    const maxFragments = webSocketOptions?.maxFragments
-    const maxPayloadSize = webSocketOptions?.maxPayloadSize
+    const maxPayloadSize = this[kController]?.dispatcher?.webSocketOptions?.maxPayloadSize
 
     const parser = new ByteParser(this, parsedExtensions, {
-      maxFragments,
       maxPayloadSize
     })
     parser.on('drain', onParserDrain)
