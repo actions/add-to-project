@@ -167,6 +167,29 @@ See the [toolkit
 documentation](https://github.com/actions/toolkit/blob/master/README.md#packages)
 for the various packages used in building this action.
 
+### Building `dist/`
+
+This action's compiled output is committed to `dist/`, and the `check-dist` workflow
+fails if `dist/` doesn't match a fresh build. If you change anything under `src/`,
+rebuild and commit `dist/` as part of your pull request:
+
+```shell
+> npm ci
+> npm run build:compile
+> npm run build:package
+> git add dist/
+```
+
+A few things worth knowing:
+
+- **Run `npm ci`, not `npm install`, before rebuilding.** `npm ci` installs exactly what
+  `package-lock.json` specifies. If `node_modules` has drifted from the lockfile — most
+  commonly after a dependency bump lands on `main` — the bundle you commit will differ
+  from the one CI builds, and `check-dist` will fail with a diff in code you never
+  touched.
+- **Prefer the two scripts above over `npm run build`**, which also runs
+  `prettier --write .` and will reformat unrelated files.
+
 ## Releasing
 
 This project uses [semantic-release](https://github.com/semantic-release/semantic-release)
