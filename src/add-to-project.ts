@@ -117,28 +117,38 @@ export async function addToProject(): Promise<void> {
   if (issueOwnerName === projectOwnerName) {
     core.info('Creating project item')
 
-    const addResp = await octokit.graphql<ProjectAddItemResponse>(
-      `mutation addIssueToProject($input: AddProjectV2ItemByIdInput!) {
-        addProjectV2ItemById(input: $input) {
-          item {
-            id
-          }
-        }
-      }`,
-      {
-        input: {
-          projectId,
-          contentId,
+    try {
+      const addResp = await octokit.graphql<ProjectAddItemResponse>(
+        `mutation addIssueToProject($input: AddProjectV2ItemByIdInput!) {
+              addProjectV2ItemById(input: $input) {
+                item {
+                  id
+                }
+              }
+            }`,
+        {
+          input: {
+            projectId,
+            contentId,
+          },
         },
-      },
-    )
+      )
 
-    core.setOutput('itemId', addResp.addProjectV2ItemById.item.id)
+      core.setOutput('itemId', addResp.addProjectV2ItemById.item.id)
+    } catch (error) {
+      if (isAlreadyInProjectError(error)) {
+        core.info(`Skipping issue ${issue?.number} because it already exists in project`)
+        return
+      }
+
+      throw error
+    }
   } else {
     core.info('Creating draft issue in project')
 
-    const addResp = await octokit.graphql<ProjectV2AddDraftIssueResponse>(
-      `mutation addDraftIssueToProject($projectId: ID!, $title: String!) {
+    try {
+      const addResp = await octokit.graphql<ProjectV2AddDraftIssueResponse>(
+        `mutation addDraftIssueToProject($projectId: ID!, $title: String!) {
         addProjectV2DraftIssue(input: {
           projectId: $projectId,
           title: $title
@@ -148,14 +158,32 @@ export async function addToProject(): Promise<void> {
           }
         }
       }`,
-      {
-        projectId,
-        title: issue?.html_url,
-      },
-    )
+        {
+          projectId,
+          title: issue?.html_url,
+        },
+      )
 
-    core.setOutput('itemId', addResp.addProjectV2DraftIssue.projectItem.id)
+      core.setOutput('itemId', addResp.addProjectV2DraftIssue.projectItem.id)
+    } catch (error) {
+      if (isAlreadyInProjectError(error)) {
+        core.info(`Skipping issue ${issue?.number} because it already exists in project`)
+        return
+      }
+
+      throw error
+    }
   }
+}
+
+// inspect octokit.graphql response and trap for error that indicates content already exists in the project.
+function isAlreadyInProjectError(error: unknown): boolean {
+  if (error instanceof Error) {
+    const msg = error.message.toLowerCase()
+    return msg.includes('content already exists in this project')
+  }
+
+  return false
 }
 
 export function mustGetOwnerTypeQuery(ownerType?: string): 'organization' | 'user' {
