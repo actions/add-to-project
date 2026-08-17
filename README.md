@@ -103,9 +103,11 @@ jobs:
   - [Inputs](#inputs)
   - [Supported Events](#supported-events)
   - [Creating a PAT and adding it to your repository](#creating-a-pat-and-adding-it-to-your-repository)
+  - [Setting a specific status or column name to the project item](#setting-a-specific-status-or-column-name-to-the-project-item)
   - [Development](#development)
-  - [Publish to a distribution branch](#publish-to-a-distribution-branch)
-- [License](#license)
+    - [Building `dist/`](#building-dist)
+  - [Releasing](#releasing)
+  - [License](#license)
 
 ## Inputs
 
@@ -115,7 +117,7 @@ jobs:
   token](https://github.com/settings/tokens/new) with `repo` and `project` scopes.
   _See [Creating a PAT and adding it to your repository](#creating-a-pat-and-adding-it-to-your-repository) for more details_
 - <a name="labeled">`labeled`</a> **(optional)** is a comma-separated list of labels used to filter applicable issues. When this key is provided, an issue must have _one_ of the labels in the list to be added to the project. Omitting this key means that any issue will be added.
-- <a name="labeled">`label-operator`</a> **(optional)** is the behavior of the labels filter, either `AND`, `OR` or `NOT` that controls if the issue should be matched with `all` `labeled` input or any of them, default is `OR`.
+- <a name="label-operator">`label-operator`</a> **(optional)** is the behavior of the labels filter, either `AND`, `OR` or `NOT` that controls if the issue should be matched with `all` `labeled` input or any of them, default is `OR`.
 
 ## Supported Events
 
@@ -156,9 +158,9 @@ Note that this action runs in Node.js 24.x, so we recommend using that version
 of Node (see "engines" in this action's package.json for details).
 
 ```shell
-> git clone https://github.com/actions/add-to-project
-> cd add-to-project
-> npm install
+git clone https://github.com/actions/add-to-project
+cd add-to-project
+npm ci
 ```
 
 Or, use [GitHub Codespaces](https://github.com/features/codespaces).
@@ -170,15 +172,20 @@ for the various packages used in building this action.
 ### Building `dist/`
 
 This action's compiled output is committed to `dist/`, and the `check-dist` workflow
-fails if `dist/` doesn't match a fresh build. If you change anything under `src/`,
-rebuild and commit `dist/` as part of your pull request:
+fails if `dist/` doesn't match a fresh build. Rebuild and commit `dist/` as part of your
+pull request whenever you change anything the bundle is built from — most commonly
+`src/`, but also `fix-regex.js`, `tsconfig.json`, or dependencies in `package.json` /
+`package-lock.json`:
 
 ```shell
-> npm ci
-> npm run build:compile
-> npm run build:package
-> git add dist/
+npm ci
+npm run build
+git add dist/
 ```
+
+`npm run build` formats, runs the type/format/lint checks, compiles, and packages, so it
+catches problems before CI does. If you only want the bundle, run `npm run build:compile`
+and `npm run build:package` — that pair is exactly what `check-dist` runs.
 
 A few things worth knowing:
 
@@ -187,8 +194,11 @@ A few things worth knowing:
   commonly after a dependency bump lands on `main` — the bundle you commit will differ
   from the one CI builds, and `check-dist` will fail with a diff in code you never
   touched.
-- **Prefer the two scripts above over `npm run build`**, which also runs
-  `prettier --write .` and will reformat unrelated files.
+- **`check-dist` ignores Markdown-only pull requests**, so a green run on a docs change
+  doesn't mean `dist/` is current.
+- **If `check-dist` fails, read the diff it prints.** It also uploads the expected
+  `dist/` as a workflow artifact, which you can download and compare against your local
+  build.
 
 ## Releasing
 
