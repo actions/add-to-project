@@ -8,7 +8,7 @@
     "@actions/github": "^6.0.0",
     "@octokit/plugin-paginate-rest": "^14.0.0",
     "@octokit/request": "^10.0.3",
-    "@octokit/request-error": "^7.1.0"
+    "@octokit/request-error": "^7.1.1"
   },
   "overrides": {
     "@actions/github": {
