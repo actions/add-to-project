@@ -658,6 +658,92 @@ describe('addToProject', () => {
     expect(gqlMock).not.toHaveBeenCalled()
   })
 
+  test(`throws an error when unable to add the item to a project by id`, async () => {
+    mockGetInput({
+      'project-url': 'https://github.com/orgs/actions/projects/1',
+      'github-token': 'gh_token',
+    })
+
+    github.context.payload = {
+      issue: {
+        number: 1,
+        labels: [],
+        // eslint-disable-next-line camelcase
+        html_url: 'https://github.com/actions/add-to-project/issues/74',
+      },
+      repository: {
+        name: 'add-to-project',
+        owner: {
+          login: 'actions',
+        },
+      },
+    }
+
+    const infoSpy = jest.spyOn(core, 'info')
+    const gqlMock = mockGraphQL(
+      {
+        test: /getProject/,
+        return: {
+          organization: {
+            projectV2: {
+              id: 'project-id',
+            },
+          },
+        },
+      },
+      {
+        test: /addProjectV2ItemById/,
+        return: () => Promise.reject(new Error('An unexpected error occurred')),
+      },
+    )
+    await expect(addToProject()).rejects.toThrow('An unexpected error occurred')
+    expect(infoSpy.mock.calls.length).toEqual(1)
+    expect(gqlMock.mock.calls.length).toEqual(2)
+  })
+
+  test(`throws an error when unable to add a draft item to a project`, async () => {
+    mockGetInput({
+      'project-url': 'https://github.com/orgs/actions/projects/1',
+      'github-token': 'gh_token',
+    })
+
+    github.context.payload = {
+      issue: {
+        number: 1,
+        labels: [],
+        // eslint-disable-next-line camelcase
+        html_url: 'https://github.com/actions/add-to-project/issues/74',
+      },
+      repository: {
+        name: 'add-to-project',
+        owner: {
+          login: 'not-actions',
+        },
+      },
+    }
+
+    const infoSpy = jest.spyOn(core, 'info')
+    const gqlMock = mockGraphQL(
+      {
+        test: /getProject/,
+        return: {
+          organization: {
+            projectV2: {
+              id: 'project-id',
+            },
+          },
+        },
+      },
+      {
+        test: /addProjectV2DraftIssue/,
+        return: () => Promise.reject(new Error('An unexpected error occurred')),
+      },
+    )
+    await expect(addToProject()).rejects.toThrow('An unexpected error occurred')
+    expect(infoSpy.mock.calls.length).toEqual(1)
+    expect(gqlMock.mock.calls.length).toEqual(2)
+  })
+
   test(`works with URLs that are not under the github.com domain`, async () => {
     github.context.payload = {
       issue: {

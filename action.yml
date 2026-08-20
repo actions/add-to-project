@@ -24,7 +24,7 @@ outputs:
     description: >-
       The node ID of the project item that was added. If the issue or pull request
       belongs to a different owner than the project, a draft issue is created and
-      this is the ID of that draft item.
+      this is the ID of that draft item. This value will be empty if the item was already present in the project.
 runs:
   using: 'node24'
   main: 'dist/index.js'
