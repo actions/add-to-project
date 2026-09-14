@@ -48,7 +48,7 @@
     "semantic-release": "^25.0.9",
     "ts-jest": "^29.4.12",
     "typescript": "^6.0.3",
-    "typescript-eslint": "^8.69.0"
+    "typescript-eslint": "^8.70.0"
   },
   "keywords": [
     "actions",
