@@ -46,7 +46,7 @@
     "jest": "^30.5.2",
     "prettier": "3.9.10",
     "semantic-release": "^25.0.9",
-    "ts-jest": "^29.4.12",
+    "ts-jest": "^29.4.14",
     "typescript": "^6.0.3",
     "typescript-eslint": "^8.71.1"
   },
