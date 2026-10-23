@@ -31,7 +31,7 @@
     "@semantic-release/release-notes-generator": "^14.1.0",
     "@types/jest": "^30.0.0",
     "@types/node": "^26.6.5",
-    "@typescript-eslint/eslint-plugin": "^8.57.2",
+    "@typescript-eslint/eslint-plugin": "^8.72.0",
     "@typescript-eslint/parser": "^8.71.2",
     "@vercel/ncc": "^0.45.0",
     "concurrently": "^10.0.6",
