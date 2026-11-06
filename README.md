@@ -121,20 +121,9 @@ jobs:
 
 ## Supported Events
 
-Currently this action supports the following [`issues` events](https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#issues):
+This action reads the issue or pull request from the event payload; it does not limit which event types can trigger the workflow. You can use any [event](https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows) whose payload includes the issue or pull request to add. See the [`issues` event payload](https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#issues) and [`pull_request` event payload](https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#pull_request) documentation for details.
 
-- `opened`
-- `reopened`
-- `transferred`
-- `labeled`
-
-and the following [`pull_request` events](https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#pull_request):
-
-- `opened`
-- `reopened`
-- `labeled`
-
-Using these events ensure that a given issue or pull request, in the workflow's repo, is added to the [specified project](#project-url). If [labeled input(s)](#labeled) are defined, then issues will only be added if they contain at least _one_ of the labels in the list.
+If [labeled input(s)](#labeled) are defined, the action only adds an issue or pull request when its labels match the configured filter.
 
 ## Creating a PAT and adding it to your repository
 
